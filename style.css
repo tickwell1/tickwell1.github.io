@@ -233,12 +233,6 @@ body.fullscreen-mode .timer{
         transform 0.2s ease;
 }
 
-
-.buttons:hover{
-    opacity: 0.8;
-}
-
-
 .start:hover{
     background-color:
         rgb(72, 73, 75);

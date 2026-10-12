@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="canonical" href="https://tickwell1.github.io/login.html">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5FERLLMF79"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5FERLLMF79');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Log in or create a Tickwell account with your email.">
+    <meta name="author" content="Hesham Khaled">
+    <title>Login - Tickwell</title>
+    <link rel="icon" type="image/png" href="./brain.png">
+    <link rel="stylesheet" href="./style.css">
+
+    <style>
+        .auth-page {
+            width: min(90%, 420px);
+            margin: 110px auto 60px;
+            text-align: center;
+        }
+
+        .auth-page h1 { margin-bottom: 8px; }
+
+        .auth-sub {
+            margin: 0 0 24px;
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        .auth-tabs {
+            position: relative;
+            display: flex;
+            gap: 6px;
+            padding: 4px;
+            margin-bottom: 22px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .tab-indicator {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc((100% - 14px) / 2);
+            border-radius: 9px;
+            background: white;
+            transform: translateX(0);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .auth-tabs.signup .tab-indicator {
+            transform: translateX(calc(100% + 6px));
+        }
+
+        .auth-tabs button {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 9px;
+            background: transparent;
+            color: inherit;
+            font-size: 15px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.35s ease;
+        }
+
+        .auth-tabs button.active {
+            color: black;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tab-indicator, .auth-tabs button { transition: none; }
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .auth-form label { font-weight: bold; font-size: 15px; }
+
+        .auth-form input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .auth-form input:focus {
+            border-color: white;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .auth-submit {
+            margin-top: 8px;
+            padding: 13px 25px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+            color: black;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .auth-submit:hover { transform: scale(1.03); opacity: 0.9; }
+        .auth-submit:disabled { opacity: 0.5; cursor: wait; transform: none; }
+
+        .link-button {
+            align-self: flex-start;
+            padding: 0;
+            border: none;
+            background: none;
+            color: inherit;
+            opacity: 0.7;
+            font-size: 14px;
+            font-family: inherit;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .auth-note {
+            display: none;
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 10px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .auth-note.error {
+            background: rgba(255, 0, 0, 0.12);
+            border: 1px solid rgba(255, 0, 0, 0.35);
+        }
+
+        .auth-note.ok {
+            background: rgba(0, 255, 120, 0.12);
+            border: 1px solid rgba(0, 255, 120, 0.35);
+        }
+
+        .signed-in { display: none; }
+        .signed-in .email { font-weight: bold; word-break: break-all; }
+        .signed-in .actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
+        .signed-in a, .signed-in button {
+            padding: 12px 22px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: transparent;
+            color: inherit;
+            font-size: 15px;
+            font-family: inherit;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        body.light-mode .auth-tabs { background: rgba(0, 0, 0, 0.07); }
+        body.light-mode .tab-indicator { background: black; }
+        body.light-mode .auth-tabs button.active { color: white; }
+        body.light-mode .auth-form input {
+            background: rgba(0, 0, 0, 0.06);
+            color: black;
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+        body.light-mode .auth-form input:focus { border-color: black; }
+        body.light-mode .auth-submit { background: black; color: white; }
+        body.light-mode .signed-in a,
+        body.light-mode .signed-in button { border-color: rgba(0, 0, 0, 0.25); }
+
+        @media (max-width: 600px) {
+            .auth-page { margin-top: 90px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Tickwell Menu -->
+    <div class="menu-container">
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" aria-expanded="false">
+            <span class="arrow">▼</span>
+        </button>
+
+        <nav class="dropdown-menu" id="dropdownMenu">
+            <a href="index.html">Home</a>
+            <a href="about.html">About Tickwell</a>
+            <a href="how-to-use.html">How to Use</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+
+    <main class="auth-page">
+
+        <img src="./brain.png" alt="Tickwell" class="about-logo">
+
+        <!-- Logged out -->
+        <section id="authBox">
+            <h1 id="authTitle">Welcome back</h1>
+            <p class="auth-sub" id="authSub">Log in to your Tickwell account.</p>
+
+            <div class="auth-tabs" id="authTabs" role="tablist">
+                <span class="tab-indicator" aria-hidden="true"></span>
+                <button type="button" id="tabLogin" class="active" role="tab" aria-selected="true">Log in</button>
+                <button type="button" id="tabSignup" role="tab" aria-selected="false">Create account</button>
+            </div>
+
+            <form class="auth-form" id="authForm" novalidate>
+                <label for="email">Email</label>
+                <input type="email" id="email" autocomplete="email" placeholder="you@example.com" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+
+                <button type="button" class="link-button" id="forgotButton">Forgot your password?</button>
+
+                <button type="submit" class="auth-submit" id="submitButton">Log in</button>
+            </form>
+        </section>
+
+        <!-- Logged in -->
+        <section class="signed-in" id="signedIn">
+            <h1>You're logged in</h1>
+            <p class="auth-sub">Signed in as</p>
+            <p class="email" id="userEmail"></p>
+            <div class="actions">
+                <a href="index.html">Back to timer</a>
+                <button type="button" id="logoutButton">Log out</button>
+            </div>
+        </section>
+
+        <div class="auth-note" id="note" role="status" aria-live="polite"></div>
+
+    </main>
+
+    <script>
+        try {
+            if (localStorage.getItem("theme") === "light") {
+                document.body.classList.add("light-mode");
+            }
+        } catch (e) {}
+
+        const menuButton = document.getElementById("menuButton");
+        const menuContainer = document.querySelector(".menu-container");
+
+        menuButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            menuContainer.classList.toggle("open");
+            menuButton.setAttribute("aria-expanded", menuContainer.classList.contains("open"));
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!menuContainer.contains(event.target)) {
+                menuContainer.classList.remove("open");
+                menuButton.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                menuContainer.classList.remove("open");
+                menuButton.setAttribute("aria-expanded", "false");
+            }
+        });
+    </script>
+
+    <script type="module">
+        import {
+            auth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            sendPasswordResetEmail,
+            sendEmailVerification,
+            signOut
+        } from "./auth.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+        const $ = (id) => document.getElementById(id);
+
+        let mode = "login"; // "login" | "signup"
+
+        function showNote(text, type) {
+            const note = $("note");
+            note.textContent = text;
+            note.className = "auth-note " + type;
+            note.style.display = "block";
+        }
+
+        function hideNote() {
+            $("note").style.display = "none";
+        }
+
+        function friendlyError(code) {
+            switch (code) {
+                case "auth/invalid-email": return "That email address isn't valid.";
+                case "auth/missing-password": return "Enter your password.";
+                case "auth/weak-password": return "Password must be at least 6 characters.";
+                case "auth/email-already-in-use": return "An account with this email already exists. Try logging in.";
+                case "auth/invalid-credential":
+                case "auth/wrong-password":
+                case "auth/user-not-found": return "Incorrect email or password.";
+                case "auth/too-many-requests": return "Too many attempts. Wait a few minutes and try again.";
+                case "auth/network-request-failed": return "Network error. Check your connection and try again.";
+                default: return "Something went wrong. Please try again.";
+            }
+        }
+
+        function setMode(next) {
+            mode = next;
+            const signup = mode === "signup";
+
+            $("authTabs").classList.toggle("signup", signup);
+            $("tabLogin").classList.toggle("active", !signup);
+            $("tabSignup").classList.toggle("active", signup);
+            $("tabLogin").setAttribute("aria-selected", String(!signup));
+            $("tabSignup").setAttribute("aria-selected", String(signup));
+
+            $("authTitle").textContent = signup ? "Create your account" : "Welcome back";
+            $("authSub").textContent = signup
+                ? "Sign up with your email to get started."
+                : "Log in to your Tickwell account.";
+            $("submitButton").textContent = signup ? "Create account" : "Log in";
+            $("forgotButton").style.display = signup ? "none" : "block";
+            $("password").autocomplete = signup ? "new-password" : "current-password";
+            hideNote();
+        }
+
+        $("tabLogin").addEventListener("click", () => setMode("login"));
+        $("tabSignup").addEventListener("click", () => setMode("signup"));
+
+        $("authForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            hideNote();
+
+            const email = $("email").value.trim();
+            const password = $("password").value;
+
+            if (!email || !password) {
+                showNote("Enter your email and password.", "error");
+                return;
+            }
+
+            const button = $("submitButton");
+            const label = button.textContent;
+            button.disabled = true;
+            button.textContent = mode === "signup" ? "Creating..." : "Logging in...";
+
+            try {
+                if (mode === "signup") {
+                    const cred = await createUserWithEmailAndPassword(auth, email, password);
+                    try { await sendEmailVerification(cred.user); } catch (e) {}
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+                window.location.href = "index.html";
+            } catch (error) {
+                showNote(friendlyError(error.code), "error");
+                button.disabled = false;
+                button.textContent = label;
+            }
+        });
+
+        $("forgotButton").addEventListener("click", async () => {
+            hideNote();
+            const email = $("email").value.trim();
+
+            if (!email) {
+                showNote("Enter your email above, then select \"Forgot your password?\" again.", "error");
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showNote("If an account exists for this email, a reset link is on its way.", "ok");
+            } catch (error) {
+                showNote(friendlyError(error.code), "error");
+            }
+        });
+
+        $("logoutButton").addEventListener("click", () => signOut(auth));
+
+        onAuthStateChanged(auth, (user) => {
+            $("authBox").style.display = user ? "none" : "block";
+            $("signedIn").style.display = user ? "block" : "none";
+            if (user) $("userEmail").textContent = user.email;
+        });
+
+        setMode("login");
+    </script>
+
+</body>
+</html>

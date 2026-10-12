@@ -35,6 +35,43 @@ function saveState() {
 }
 
 
+/* ========================= */
+/* منع قفل الشاشة أثناء العد */
+/* ========================= */
+
+let wakeLock = null;
+
+async function requestWakeLock() {
+    try {
+        if ("wakeLock" in navigator && !wakeLock) {
+            wakeLock = await navigator.wakeLock.request("screen");
+
+            wakeLock.addEventListener("release", () => {
+                wakeLock = null;
+            });
+        }
+    } catch (e) {
+        console.log("Wake Lock error:", e);
+    }
+}
+
+async function releaseWakeLock() {
+    try {
+        if (wakeLock) {
+            await wakeLock.release();
+            wakeLock = null;
+        }
+    } catch (e) {}
+}
+
+/* لو المتصفح فك القفل (مثلاً لما تخرج من التاب)، نرجّعه تاني عند الرجوع */
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && running) {
+        requestWakeLock();
+    }
+});
+
+
 function updateTimer() {
 
     const hours = String(
@@ -66,6 +103,7 @@ function startTimer() {
     interval = setInterval(tick, 250);
     startButton.textContent = "إيقاف";
     buttons.classList.add("running");
+    requestWakeLock();
     saveState();
 }
 
@@ -77,6 +115,7 @@ function stopTimer() {
     running = false;
     startButton.textContent = "ابدأ";
     buttons.classList.remove("running");
+    releaseWakeLock();
     saveState();
 }
 
@@ -100,6 +139,7 @@ resetButton.addEventListener("click", () => {
     updateTimer();
     startButton.textContent = "ابدأ";
     buttons.classList.remove("running");
+    releaseWakeLock();
     saveState();
 });
 
@@ -118,6 +158,7 @@ try {
             interval = setInterval(tick, 250);
             startButton.textContent = "إيقاف";
             buttons.classList.add("running");
+            requestWakeLock();
         } else {
             seconds = Math.floor(elapsed / 1000);
             updateTimer();

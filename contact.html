@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page data-rtl data-title-key="title.contact">
 
 <head>
     <link rel="canonical" href="https://tickwell1.github.io/contact.html">
@@ -28,6 +28,16 @@
 
     <link rel="icon" type="image/png" href="./brain.png">
 
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tickwell">
+
+    <script src="./settings.js"></script>
+    <script src="./stats.js"></script>
+
     <link rel="stylesheet" href="./style.css">
 
     <style>
@@ -51,7 +61,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            text-align: left;
+            text-align: start;
         }
 
         .contact-form label {
@@ -168,7 +178,7 @@
             class="menu-button"
             id="menuButton"
             type="button"
-            aria-label="Open menu"
+            aria-label="Open menu" data-i18n-aria="menu.open"
             aria-expanded="false">
 
             <span class="arrow">▼</span>
@@ -178,15 +188,19 @@
 
         <nav class="dropdown-menu" id="dropdownMenu">
 
-            <a href="index.html">Home</a>
+            <a href="index.html" data-i18n="menu.home">Home</a>
 
-            <a href="about.html">About Tickwell</a>
+            <a href="dashboard.html" data-i18n="menu.dashboard">Dashboard</a>
 
-            <a href="how-to-use.html">How to Use</a>
+            <a href="settings.html" data-i18n="menu.settings">Settings</a>
 
-            <a href="privacy.html">Privacy Policy</a>
+            <a href="about.html" data-i18n="menu.about">About Tickwell</a>
 
-            <a href="contact.html">Contact</a>
+            <a href="how-to-use.html" data-i18n="menu.howto">How to Use</a>
+
+            <a href="privacy.html" data-i18n="menu.privacy">Privacy Policy</a>
+
+            <a href="contact.html" data-i18n="menu.contact">Contact</a>
 
         </nav>
 
@@ -205,10 +219,10 @@
         >
 
 
-        <h1>Contact Tickwell</h1>
+        <h1 data-i18n="contact.h1">Contact Tickwell</h1>
 
 
-        <p>
+        <p data-i18n="contact.intro">
             Have a question, suggestion, or found a problem?
             Send us a message and we will receive it through our
             contact system.
@@ -225,42 +239,36 @@
             method="POST">
 
 
-            <label for="name">
-                Name
-            </label>
+            <label for="name" data-i18n="contact.name">Name</label>
 
             <input
                 type="text"
                 id="name"
                 name="name"
-                placeholder="Enter your name"
+                placeholder="Enter your name" data-i18n-placeholder="contact.namePh"
                 required
             >
 
 
 
-            <label for="email">
-                Email
-            </label>
+            <label for="email" data-i18n="contact.email">Email</label>
 
             <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder="Enter your email" data-i18n-placeholder="contact.emailPh"
                 required
             >
 
 
 
-            <label for="message">
-                Message
-            </label>
+            <label for="message" data-i18n="contact.message">Message</label>
 
             <textarea
                 id="message"
                 name="message"
-                placeholder="Write your message..."
+                placeholder="Write your message..." data-i18n-placeholder="contact.messagePh"
                 required
             ></textarea>
 
@@ -269,11 +277,7 @@
             <button
                 type="submit"
                 class="send-button"
-                id="sendButton">
-
-                Send Message
-
-            </button>
+                id="sendButton" data-i18n="contact.send">Send Message</button>
 
 
         </form>
@@ -284,20 +288,12 @@
 
         <div
             class="success-message"
-            id="successMessage">
-
-            Your message has been sent successfully. Thank you for contacting Tickwell!
-
-        </div>
+            id="successMessage" data-i18n="contact.success">Your message has been sent successfully. Thank you for contacting Tickwell!</div>
 
 
         <div
             class="error-message"
-            id="errorMessage">
-
-            Something went wrong. Please try again.
-
-        </div>
+            id="errorMessage" data-i18n="contact.error">Something went wrong. Please try again.</div>
 
     </main>
 
@@ -413,7 +409,7 @@
 
             sendButton.disabled = true;
 
-            sendButton.textContent = "Sending...";
+            sendButton.textContent = window.TickwellSettings.t("contact.sending");
 
             successMessage.style.display = "none";
 
@@ -459,13 +455,14 @@
 
             sendButton.disabled = false;
 
-            sendButton.textContent = "Send Message";
+            sendButton.textContent = window.TickwellSettings.t("contact.send");
 
         });
 
     </script>
-    <script type="module" src="./auth.js"></script>
 
+
+    <script type="module" src="./auth.js"></script>
 
 </body>
 

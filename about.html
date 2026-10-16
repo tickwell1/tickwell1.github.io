@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page data-rtl data-title-key="title.about">
 <head>
     <link rel="canonical" href="https://tickwell1.github.io/about.html">
     <!-- Google tag (gtag.js) -->
@@ -25,6 +25,16 @@
 
     <link rel="icon" type="image/png" href="./brain.png">
 
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tickwell">
+
+    <script src="./settings.js"></script>
+    <script src="./stats.js"></script>
+
     <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -36,7 +46,7 @@
         <button
             class="menu-button"
             id="menuButton"
-            aria-label="Open menu"
+            aria-label="Open menu" data-i18n-aria="menu.open"
             aria-expanded="false"
         >
             <span class="arrow">▼</span>
@@ -44,15 +54,19 @@
 
         <nav class="dropdown-menu" id="dropdownMenu">
 
-            <a href="index.html">Home</a>
+            <a href="index.html" data-i18n="menu.home">Home</a>
 
-            <a href="about.html">About Tickwell</a>
+            <a href="dashboard.html" data-i18n="menu.dashboard">Dashboard</a>
 
-            <a href="how-to-use.html">How to Use</a>
+            <a href="settings.html" data-i18n="menu.settings">Settings</a>
 
-            <a href="privacy.html">Privacy Policy</a>
+            <a href="about.html" data-i18n="menu.about">About Tickwell</a>
 
-            <a href="contact.html">Contact</a>
+            <a href="how-to-use.html" data-i18n="menu.howto">How to Use</a>
+
+            <a href="privacy.html" data-i18n="menu.privacy">Privacy Policy</a>
+
+            <a href="contact.html" data-i18n="menu.contact">Contact</a>
 
         </nav>
 
@@ -68,31 +82,31 @@
             class="about-logo"
         >
 
-        <h1>About Tickwell</h1>
+        <h1 data-i18n="about.0">About Tickwell</h1>
 
-        <p>
+        <p data-i18n="about.1">
             Tickwell is a simple and free study timer designed to help you
             focus on your tasks and organize your study time.
         </p>
 
-        <p>
+        <p data-i18n="about.2">
             With a clean and easy-to-use interface, Tickwell lets you start
             a study session, track your time, and stay focused without
             unnecessary distractions.
         </p>
 
-        <h2>Why Tickwell?</h2>
+        <h2 data-i18n="about.3">Why Tickwell?</h2>
 
-        <p>
+        <p data-i18n="about.4">
             Tickwell was created to make studying easier and more organized.
             Whether you are studying for school, university, or working on
             personal projects, you can use Tickwell to manage your time
             and maintain your focus.
         </p>
 
-        <h2>Simple. Focused. Free.</h2>
+        <h2 data-i18n="about.5">Simple. Focused. Free.</h2>
 
-        <p>
+        <p data-i18n="about.6">
             Tickwell focuses on providing the essential tools you need for
             a productive study session while keeping the experience simple
             and distraction-free.
@@ -137,6 +151,7 @@
             }
         });
     </script>
+
     <script type="module" src="./auth.js"></script>
 
 </body>

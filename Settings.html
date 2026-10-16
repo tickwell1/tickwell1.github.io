@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-i18n-page data-rtl data-title-key="title.settings">
+<head>
+    <link rel="canonical" href="https://tickwell1.github.io/settings.html">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5FERLLMF79"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5FERLLMF79');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tickwell settings: language, theme, Pomodoro durations, sound and more.">
+    <meta name="author" content="Hesham Khaled">
+    <title>Settings - Tickwell</title>
+    <link rel="icon" type="image/png" href="./brain.png">
+
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tickwell">
+
+    <script src="./settings.js"></script>
+
+    <link rel="stylesheet" href="./style.css">
+
+    <style>
+        .set-page {
+            width: min(94%, 720px);
+            margin: 100px auto 60px;
+            font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+        }
+
+        .set-head { text-align: center; margin-bottom: 26px; }
+        .set-head img { width: 56px; height: 56px; }
+        .set-head h1 { margin: 10px 0 6px; font-size: 30px; }
+        .set-head p { margin: 0; opacity: 0.7; line-height: 1.6; }
+
+        .card {
+            margin-bottom: 18px;
+            padding: 8px 20px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 { margin: 16px 0 4px; font-size: 18px; }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .row:last-child { border-bottom: none; }
+
+        .row-text { flex: 1; min-width: 180px; }
+        .row-title { font-size: 15px; font-weight: bold; }
+        .row-hint { margin-top: 3px; font-size: 13px; line-height: 1.5; opacity: 0.65; }
+
+        /* ---- Segmented control ---- */
+        .seg {
+            position: relative;
+            display: inline-grid;
+            grid-auto-flow: column;
+            grid-auto-columns: 1fr;
+            gap: 4px;
+            padding: 4px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            direction: ltr;
+            flex-shrink: 0;
+        }
+
+        .seg-ind {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc((100% - 8px - (var(--n, 2) - 1) * 4px) / var(--n, 2));
+            border-radius: 9px;
+            background: white;
+            transform: translateX(calc(var(--i, 0) * (100% + 4px)));
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .seg button {
+            position: relative;
+            z-index: 1;
+            min-width: 80px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 9px;
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.35s ease;
+        }
+
+        .seg button.active { color: black; }
+
+        /* ---- Toggle switch ---- */
+        .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; direction: ltr; }
+
+        .switch input {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .knob {
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.25s ease;
+        }
+
+        .knob::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            transition: transform 0.25s ease;
+        }
+
+        .switch input:checked + .knob { background: #4ade80; }
+        .switch input:checked + .knob::after { transform: translateX(20px); }
+        .switch input:focus-visible + .knob { outline: 2px solid currentColor; outline-offset: 2px; }
+        .switch input:disabled { cursor: not-allowed; }
+        .switch input:disabled + .knob { opacity: 0.4; }
+
+        /* ---- Inputs & buttons ---- */
+        .num {
+            width: 84px;
+            padding: 9px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            font-family: inherit;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+        }
+
+        .num:focus { border-color: white; }
+
+        .volume-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .volume-wrap input[type="range"] { width: 150px; accent-color: currentColor; }
+
+        .btn {
+            padding: 9px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.25s ease;
+        }
+
+        .btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .btn:disabled { opacity: 0.5; cursor: wait; }
+        a.btn { display: inline-block; text-decoration: none; }
+
+        .btn.danger { border-color: rgba(255, 90, 90, 0.5); color: #ff6b6b; }
+        .btn.danger:hover { background: rgba(255, 90, 90, 0.12); }
+
+        /* ---- Light mode ---- */
+        body.light-mode .card { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.1); }
+        body.light-mode .row { border-bottom-color: rgba(0, 0, 0, 0.08); }
+        body.light-mode .seg { background: rgba(0, 0, 0, 0.07); }
+        body.light-mode .seg-ind { background: black; }
+        body.light-mode .seg button.active { color: white; }
+        body.light-mode .knob { background: rgba(0, 0, 0, 0.2); }
+        body.light-mode .switch input:checked + .knob { background: #16a34a; }
+        body.light-mode .num { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.2); }
+        body.light-mode .num:focus { border-color: black; }
+        body.light-mode .btn { border-color: rgba(0, 0, 0, 0.3); }
+        body.light-mode .btn:hover { background: rgba(0, 0, 0, 0.07); }
+        body.light-mode .btn.danger { border-color: rgba(220, 38, 38, 0.5); color: #dc2626; }
+
+        @media (max-width: 600px) {
+            .set-page { margin-top: 90px; }
+            .set-head h1 { font-size: 26px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .seg-ind, .seg button, .knob, .knob::after { transition: none; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Tickwell Menu -->
+    <div class="menu-container">
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" data-i18n-aria="menu.open" aria-expanded="false">
+            <span class="arrow">▼</span>
+        </button>
+
+        <nav class="dropdown-menu" id="dropdownMenu">
+            <a href="index.html" data-i18n="menu.home">Home</a>
+            <a href="dashboard.html" data-i18n="menu.dashboard">Dashboard</a>
+            <a href="settings.html" data-i18n="menu.settings">Settings</a>
+            <a href="about.html" data-i18n="menu.about">About Tickwell</a>
+            <a href="how-to-use.html" data-i18n="menu.howto">How to Use</a>
+            <a href="privacy.html" data-i18n="menu.privacy">Privacy Policy</a>
+            <a href="contact.html" data-i18n="menu.contact">Contact</a>
+        </nav>
+    </div>
+
+    <main class="set-page">
+
+        <div class="set-head">
+            <img src="./brain.png" alt="Tickwell">
+            <h1 data-i18n="set.title">الإعدادات</h1>
+            <p data-i18n="set.sub">خصّص Tickwell على كيفك. التغييرات بتتحفظ تلقائيًا.</p>
+        </div>
+
+        <!-- Appearance -->
+        <section class="card">
+            <h2 data-i18n="sec.appearance">المظهر</h2>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.language">اللغة</div>
+                    <div class="row-hint" data-i18n="set.languageHint"></div>
+                </div>
+
+                <div class="seg" id="langSeg" role="group">
+                    <span class="seg-ind" aria-hidden="true"></span>
+                    <button type="button" data-value="ar">العربية</button>
+                    <button type="button" data-value="en">English</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.theme">الوضع</div>
+                </div>
+
+                <div class="seg" id="themeSeg" role="group">
+                    <span class="seg-ind" aria-hidden="true"></span>
+                    <button type="button" data-value="dark" data-i18n="theme.dark">داكن</button>
+                    <button type="button" data-value="light" data-i18n="theme.light">ساطع</button>
+                    <button type="button" data-value="auto" data-i18n="theme.auto">تلقائي</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pomodoro -->
+        <section class="card">
+            <h2 data-i18n="sec.pomodoro">بومودورو</h2>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.focus">مدة التركيز (دقيقة)</div></div>
+                <input class="num" type="number" id="focusInput" min="1" max="180" inputmode="numeric">
+            </div>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.short">الراحة القصيرة (دقيقة)</div></div>
+                <input class="num" type="number" id="shortInput" min="1" max="60" inputmode="numeric">
+            </div>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.long">الراحة الطويلة (دقيقة)</div></div>
+                <input class="num" type="number" id="longInput" min="1" max="120" inputmode="numeric">
+            </div>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.sessions">جلسات التركيز قبل الراحة الطويلة</div></div>
+                <input class="num" type="number" id="sessionsInput" min="1" max="10" inputmode="numeric">
+            </div>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.auto">بدء المرحلة التالية تلقائيًا</div>
+                    <div class="row-hint" data-i18n="set.autoHint"></div>
+                </div>
+                <label class="switch"><input type="checkbox" id="autoToggle"><span class="knob"></span></label>
+            </div>
+        </section>
+
+        <!-- Sound & notifications -->
+        <section class="card">
+            <h2 data-i18n="sec.sound">الصوت والإشعارات</h2>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.sound">صوت التنبيه</div></div>
+                <label class="switch"><input type="checkbox" id="soundToggle"><span class="knob"></span></label>
+            </div>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.volume">مستوى الصوت</div></div>
+
+                <div class="volume-wrap">
+                    <input type="range" id="volumeRange" min="0" max="100" step="5">
+                    <button type="button" class="btn" id="testSound" data-i18n="set.test">تجربة الصوت</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.notif">إشعارات المتصفح</div>
+                    <div class="row-hint" data-i18n="set.notifHint"></div>
+                </div>
+                <label class="switch"><input type="checkbox" id="notifToggle"><span class="knob"></span></label>
+            </div>
+        </section>
+
+        <!-- Study -->
+        <section class="card">
+            <h2 data-i18n="sec.study">المذاكرة</h2>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.goal">الهدف اليومي (بالدقائق)</div></div>
+                <input class="num" type="number" id="goalInput" min="5" max="1440" step="5" inputmode="numeric">
+            </div>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.wake">إبقاء الشاشة مضيئة أثناء العد</div>
+                    <div class="row-hint" data-i18n="set.wakeHint"></div>
+                </div>
+                <label class="switch"><input type="checkbox" id="wakeToggle"><span class="knob"></span></label>
+            </div>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.shortcuts">اختصارات لوحة المفاتيح</div>
+                    <div class="row-hint" data-i18n="set.shortcutsHint"></div>
+                </div>
+                <label class="switch"><input type="checkbox" id="shortcutsToggle"><span class="knob"></span></label>
+            </div>
+        </section>
+
+        <!-- Account & sync -->
+        <section class="card">
+            <h2 data-i18n="sec.account">الحساب والمزامنة</h2>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" id="syncTitle"></div>
+                    <div class="row-hint" id="syncHint"></div>
+                </div>
+
+                <a class="btn" id="syncLogin" href="login.html" data-i18n="menu.login">Login</a>
+                <button type="button" class="btn" id="syncNow" data-i18n="sync.now">زامن الآن</button>
+            </div>
+        </section>
+
+        <!-- App (PWA) -->
+        <section class="card">
+            <h2 data-i18n="sec.app">التطبيق</h2>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" id="pwaTitle"></div>
+                    <div class="row-hint" id="pwaHint"></div>
+                </div>
+
+                <button type="button" class="btn" id="pwaInstall" data-i18n="pwa.installBtn">تثبيت</button>
+            </div>
+        </section>
+
+        <!-- Data -->
+        <section class="card">
+            <h2 data-i18n="sec.data">البيانات</h2>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.export">تصدير بياناتي</div>
+                    <div class="row-hint" data-i18n="set.exportHint"></div>
+                </div>
+                <button type="button" class="btn" id="exportButton" data-i18n="set.export">تصدير بياناتي</button>
+            </div>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.resetSettings">إعادة الإعدادات للافتراضي</div></div>
+                <button type="button" class="btn" id="resetSettingsButton" data-i18n="set.resetSettings">إعادة الإعدادات للافتراضي</button>
+            </div>
+
+            <div class="row">
+                <div class="row-text"><div class="row-title" data-i18n="set.clearStats">مسح الإحصائيات</div></div>
+                <button type="button" class="btn danger" id="clearStatsButton" data-i18n="set.clearStats">مسح الإحصائيات</button>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+    <script>
+        const menuButton = document.getElementById("menuButton");
+        const menuContainer = document.querySelector(".menu-container");
+
+        menuButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            menuContainer.classList.toggle("open");
+            menuButton.setAttribute("aria-expanded", menuContainer.classList.contains("open"));
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!menuContainer.contains(event.target)) {
+                menuContainer.classList.remove("open");
+                menuButton.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                menuContainer.classList.remove("open");
+                menuButton.setAttribute("aria-expanded", "false");
+            }
+        });
+    </script>
+
+    <script src="./stats.js"></script>
+
+    <script>
+        (function () {
+
+            const S = window.TickwellSettings;
+            const ST = window.TickwellStats;
+            const $ = (id) => document.getElementById(id);
+
+            const NUMBER_INPUTS = {
+                focusInput: "focus",
+                shortInput: "short",
+                longInput: "long",
+                sessionsInput: "sessions"
+            };
+
+            const TOGGLES = {
+                autoToggle: ["pomo", "auto"],
+                soundToggle: ["sound"],
+                wakeToggle: ["wakeLock"],
+                shortcutsToggle: ["shortcuts"]
+            };
+
+            let toastTimer = null;
+
+
+            function toast(text) {
+                const el = $("toast");
+
+                el.textContent = text;
+                el.classList.add("show");
+
+                clearTimeout(toastTimer);
+
+                toastTimer = setTimeout(() => el.classList.remove("show"), 1600);
+            }
+
+
+            function saved() {
+                toast(S.t("set.saved"));
+            }
+
+
+            function setSeg(id, value) {
+                const seg = $(id);
+                const buttons = Array.from(seg.querySelectorAll("button"));
+                const index = Math.max(0, buttons.findIndex((b) => b.dataset.value === value));
+
+                seg.style.setProperty("--n", buttons.length);
+                seg.style.setProperty("--i", index);
+
+                buttons.forEach((b, i) => {
+                    b.classList.toggle("active", i === index);
+                    b.setAttribute("aria-pressed", String(i === index));
+                });
+            }
+
+
+            function populate() {
+                const s = S.get();
+                const focused = document.activeElement;
+
+                setSeg("langSeg", s.lang);
+                setSeg("themeSeg", s.theme);
+
+                Object.keys(NUMBER_INPUTS).forEach((id) => {
+                    if (focused !== $(id)) $(id).value = s.pomo[NUMBER_INPUTS[id]];
+                });
+
+                $("autoToggle").checked = s.pomo.auto;
+                $("soundToggle").checked = s.sound;
+                $("wakeToggle").checked = s.wakeLock;
+                $("shortcutsToggle").checked = s.shortcuts;
+
+                if (focused !== $("volumeRange")) $("volumeRange").value = Math.round(s.volume * 100);
+
+                const notifSupported = "Notification" in window;
+
+                $("notifToggle").disabled = !notifSupported;
+                $("notifToggle").checked =
+                    notifSupported && s.notifications && Notification.permission === "granted";
+
+                if (focused !== $("goalInput")) $("goalInput").value = ST.load().goal;
+            }
+
+
+            /* اللغة والوضع */
+            $("langSeg").addEventListener("click", (event) => {
+                const btn = event.target.closest("button");
+
+                if (!btn) return;
+
+                S.update({ lang: btn.dataset.value });
+                saved();
+            });
+
+            $("themeSeg").addEventListener("click", (event) => {
+                const btn = event.target.closest("button");
+
+                if (!btn) return;
+
+                S.update({ theme: btn.dataset.value });
+                saved();
+            });
+
+
+            /* أرقام بومودورو */
+            Object.keys(NUMBER_INPUTS).forEach((id) => {
+                $(id).addEventListener("change", (event) => {
+                    S.update({ pomo: { [NUMBER_INPUTS[id]]: event.target.value } });
+                    populate();
+                    saved();
+                });
+            });
+
+
+            /* المفاتيح */
+            Object.keys(TOGGLES).forEach((id) => {
+                $(id).addEventListener("change", (event) => {
+                    const path = TOGGLES[id];
+                    const value = event.target.checked;
+
+                    S.update(path.length === 2 ? { pomo: { [path[1]]: value } } : { [path[0]]: value });
+                    saved();
+                });
+            });
+
+
+            /* إشعارات المتصفح */
+            $("notifToggle").addEventListener("change", async (event) => {
+                const on = event.target.checked;
+
+                if (on) {
+                    let permission = Notification.permission;
+
+                    if (permission === "default") {
+                        try {
+                            permission = await Notification.requestPermission();
+                        } catch (e) {}
+                    }
+
+                    if (permission !== "granted") {
+                        event.target.checked = false;
+                        S.update({ notifications: false });
+
+                        if (permission === "denied") toast(S.t("set.notifBlocked"));
+
+                        return;
+                    }
+                }
+
+                S.update({ notifications: on });
+                saved();
+            });
+
+
+            /* الصوت */
+            $("volumeRange").addEventListener("input", (event) => {
+                S.update({ volume: Number(event.target.value) / 100 });
+            });
+
+            $("volumeRange").addEventListener("change", () => {
+                S.beep(true);
+                saved();
+            });
+
+            $("testSound").addEventListener("click", () => S.beep(true));
+
+
+            /* الهدف اليومي */
+            $("goalInput").addEventListener("change", (event) => {
+                ST.setGoal(event.target.value);
+                $("goalInput").value = ST.load().goal;
+                saved();
+            });
+
+
+            /* البيانات */
+            $("exportButton").addEventListener("click", () => {
+                let stats = null;
+
+                try {
+                    stats = JSON.parse(localStorage.getItem("tickwellStats"));
+                } catch (e) {}
+
+                const payload = {
+                    exportedAt: new Date().toISOString(),
+                    settings: S.get(),
+                    stats
+                };
+
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+                const link = document.createElement("a");
+
+                link.href = URL.createObjectURL(blob);
+                link.download = "tickwell-data.json";
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+            });
+
+            $("resetSettingsButton").addEventListener("click", () => {
+                if (confirm(S.t("set.resetConfirm"))) {
+                    S.reset();
+                    saved();
+                }
+            });
+
+            $("clearStatsButton").addEventListener("click", () => {
+                if (confirm(S.t("dash.clearConfirm"))) {
+                    ST.clear();
+                    populate();
+                    saved();
+                }
+            });
+
+
+            /* الحساب والمزامنة */
+            let waited = false;
+
+            setTimeout(() => { waited = true; renderSync(); }, 4000);
+
+            function fmtTime(ms) {
+                return new Date(ms).toLocaleTimeString(S.locale(), { hour: "2-digit", minute: "2-digit" });
+            }
+
+            function renderSync() {
+                const sync = window.TickwellSync;
+                const st = sync ? sync.getStatus() : { state: waited ? "signedOut" : "checking" };
+
+                const signedOut = st.state === "signedOut";
+                const checking = st.state === "checking";
+
+                $("syncLogin").style.display = signedOut ? "" : "none";
+                $("syncNow").style.display = signedOut || checking ? "none" : "";
+                $("syncNow").disabled = st.state === "syncing";
+
+                if (checking) {
+                    $("syncTitle").textContent = "...";
+                    $("syncHint").textContent = "";
+                    return;
+                }
+
+                if (signedOut) {
+                    $("syncTitle").textContent = S.t("sync.signedOut");
+                    $("syncHint").textContent = S.t("sync.signedOutHint");
+                    return;
+                }
+
+                $("syncTitle").textContent =
+                    st.state === "syncing" ? S.t("sync.syncing")
+                    : st.state === "error" ? S.t("sync.error")
+                    : S.t("sync.synced");
+
+                const lines = [S.t("sync.account", { email: st.email || "" })];
+
+                if (st.state === "error") {
+                    lines.push(S.t("sync.errorHint"));
+                } else if (st.lastSynced) {
+                    lines.push(S.t("sync.last", { time: fmtTime(st.lastSynced) }));
+                }
+
+                $("syncHint").textContent = lines.join(" - ");
+            }
+
+            $("syncNow").addEventListener("click", async () => {
+                if (!window.TickwellSync) return;
+
+                await window.TickwellSync.syncNow();
+                renderSync();
+            });
+
+            /* تثبيت التطبيق */
+            function renderPwa() {
+                const P = window.TickwellPWA;
+
+                $("pwaInstall").style.display = "none";
+
+                if (P.isStandalone()) {
+                    $("pwaTitle").textContent = S.t("pwa.installed");
+                    $("pwaHint").textContent = "";
+                    return;
+                }
+
+                $("pwaTitle").textContent = S.t("pwa.install");
+
+                if (P.canInstall()) {
+                    $("pwaHint").textContent = S.t("pwa.installHint");
+                    $("pwaInstall").style.display = "";
+                } else if (P.isIOS()) {
+                    $("pwaHint").textContent = S.t("pwa.ios");
+                } else {
+                    $("pwaHint").textContent = S.t("pwa.installHint") + " " + S.t("pwa.manual");
+                }
+            }
+
+            $("pwaInstall").addEventListener("click", async () => {
+                await window.TickwellPWA.install();
+                renderPwa();
+            });
+
+
+            window.addEventListener("tickwell:sync", renderSync);
+            window.addEventListener("tickwell:pwa", renderPwa);
+            window.addEventListener("tickwell:stats-remote", populate);
+            window.addEventListener("tickwell:settings", () => { renderSync(); renderPwa(); });
+
+            renderSync();
+            renderPwa();
+
+            window.addEventListener("tickwell:settings", populate);
+
+            populate();
+
+        })();
+    </script>
+
+    <script type="module" src="./auth.js"></script>
+
+</body>
+</html>

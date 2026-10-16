@@ -1,33 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://tickwell1.github.io/</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://tickwell1.github.io/about.html</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://tickwell1.github.io/how-to-use.html</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://tickwell1.github.io/contact.html</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://tickwell1.github.io/privacy.html</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
+
+    <url>
+        <loc>https://hishamkhaledmon.github.io/</loc>
+    </url>
+
+    <url>
+        <loc>https://hishamkhaledmon.github.io/about.html</loc>
+    </url>
+
+    <url>
+        <loc>https://hishamkhaledmon.github.io/how-to-use.html</loc>
+    </url>
+
+    <url>
+        <loc>https://hishamkhaledmon.github.io/privacy.html</loc>
+    </url>
+
+    <url>
+        <loc>https://hishamkhaledmon.github.io/contact.html</loc>
+    </url>
+
 </urlset>

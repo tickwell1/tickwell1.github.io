@@ -1,182 +1,390 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl" data-i18n-page data-rtl data-title-key="title.dashboard">
 <head>
-    <link rel="canonical" href="https://tickwell1.github.io/privacy.html">
+    <link rel="canonical" href="https://tickwell1.github.io/dashboard.html">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5FERLLMF79"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-    
       gtag('config', 'G-5FERLLMF79');
     </script>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="description" content="Tickwell Privacy Policy. Learn how Tickwell handles information, cookies, local storage, and user privacy.">
-
-    <meta name="keywords" content="Tickwell, Privacy Policy, privacy, study timer, cookies">
-
+    <meta name="description" content="لوحة تحكم Tickwell: إحصائيات المذاكرة والهدف اليومي.">
     <meta name="author" content="Hesham Khaled">
-
-    <title>Privacy Policy - Tickwell</title>
-
+    <title>Dashboard - Tickwell</title>
     <link rel="icon" type="image/png" href="./brain.png">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tickwell">
+
+    <script src="./settings.js"></script>
 
     <link rel="stylesheet" href="./style.css">
+
+    <style>
+        .dash-page {
+            width: min(94%, 860px);
+            margin: 100px auto 60px;
+            font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+        }
+
+        .dash-head { text-align: center; margin-bottom: 26px; }
+        .dash-head img { width: 56px; height: 56px; }
+        .dash-head h1 { margin: 10px 0 6px; font-size: 30px; }
+        .dash-head p { margin: 0; opacity: 0.7; }
+
+        .card {
+            margin-bottom: 18px;
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 { margin: 0 0 16px; font-size: 18px; }
+
+        /* ---- Daily goal ---- */
+        .goal-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+        }
+
+        .ring { position: relative; width: 150px; height: 150px; }
+        .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+        .ring-track {
+            fill: none;
+            stroke: currentColor;
+            stroke-opacity: 0.15;
+            stroke-width: 12;
+        }
+
+        .ring-fill {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 339.292;
+            stroke-dashoffset: 339.292;
+            transition: stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease;
+        }
+
+        .ring.done .ring-fill { stroke: #4ade80; }
+
+        .ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ring-pct { font-size: 30px; font-weight: bold; }
+        .ring-sub { font-size: 12px; opacity: 0.7; }
+
+        .goal-side { flex: 1; min-width: 240px; }
+        .goal-text { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+        .goal-msg { opacity: 0.75; margin-bottom: 16px; }
+
+        .goal-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+        .chip {
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            background: transparent;
+            color: inherit;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+
+        .chip.active { background: white; color: black; border-color: white; }
+
+        .goal-custom { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+
+        .goal-custom input {
+            width: 90px;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .goal-custom input:focus { border-color: white; }
+
+        /* ---- Stats grid ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .stat {
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-value { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+        .stat-label { font-size: 13px; opacity: 0.7; }
+
+        .empty-note {
+            display: none;
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        /* ---- Chart ---- */
+        .chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .chart-head h2 { margin: 0; }
+
+        .range-toggle { display: flex; gap: 6px; }
+
+        .range-toggle button {
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            background: transparent;
+            color: inherit;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+
+        .range-toggle button.active { background: white; color: black; border-color: white; }
+
+        .chart-plot {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 180px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bar-col {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .bar {
+            width: 70%;
+            max-width: 34px;
+            min-height: 0;
+            border-radius: 6px 6px 0 0;
+            background: currentColor;
+            opacity: 0.5;
+            transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bar.today { opacity: 0.95; }
+        .bar.hit { background: #4ade80; opacity: 0.9; }
+
+        .goal-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-top: 2px dashed currentColor;
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .chart-labels { display: flex; gap: 4px; margin-top: 8px; }
+
+        .chart-labels div {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+
+        .chart-note { margin: 12px 0 0; font-size: 12px; opacity: 0.6; }
+
+        /* ---- Footer ---- */
+        .dash-foot { text-align: center; margin-top: 26px; font-size: 13px; opacity: 0.75; line-height: 1.8; }
+
+        .danger-button {
+            margin-top: 10px;
+            padding: 9px 18px;
+            border: 1px solid rgba(255, 90, 90, 0.5);
+            border-radius: 10px;
+            background: transparent;
+            color: #ff6b6b;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .danger-button:hover { background: rgba(255, 90, 90, 0.12); }
+
+        /* ---- Light mode ---- */
+        body.light-mode .card { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.1); }
+        body.light-mode .stat { background: rgba(0, 0, 0, 0.04); border-color: rgba(0, 0, 0, 0.08); }
+        body.light-mode .empty-note { background: rgba(0, 0, 0, 0.06); }
+        body.light-mode .chip,
+        body.light-mode .range-toggle button { border-color: rgba(0, 0, 0, 0.25); }
+        body.light-mode .chip.active,
+        body.light-mode .range-toggle button.active { background: black; color: white; border-color: black; }
+        body.light-mode .goal-custom input { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.2); }
+        body.light-mode .goal-custom input:focus { border-color: black; }
+        body.light-mode .chart-plot { border-bottom-color: rgba(0, 0, 0, 0.25); }
+        body.light-mode .ring.done .ring-fill,
+        body.light-mode .bar.hit { stroke: #16a34a; }
+        body.light-mode .bar.hit { background: #16a34a; }
+
+        @media (max-width: 600px) {
+            .dash-page { margin-top: 90px; }
+            .dash-head h1 { font-size: 26px; }
+            .chart-plot { height: 150px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ring-fill, .bar { transition: none; }
+        }
+    </style>
 </head>
 
 <body>
 
     <!-- Tickwell Menu -->
     <div class="menu-container">
-
-        <button
-            class="menu-button"
-            id="menuButton"
-            aria-label="Open menu"
-            aria-expanded="false"
-        >
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" data-i18n-aria="menu.open" aria-expanded="false">
             <span class="arrow">▼</span>
         </button>
 
         <nav class="dropdown-menu" id="dropdownMenu">
+            <a href="index.html" data-i18n="menu.home">Home</a>
 
-            <a href="index.html">Home</a>
+            <a href="dashboard.html" data-i18n="menu.dashboard">Dashboard</a>
 
-            <a href="about.html">About Tickwell</a>
+            <a href="settings.html" data-i18n="menu.settings">Settings</a>
 
-            <a href="how-to-use.html">How to Use</a>
-
-            <a href="privacy.html">Privacy Policy</a>
-
-            <a href="contact.html">Contact</a>
-
+            <a href="about.html" data-i18n="menu.about">About Tickwell</a>
+            <a href="how-to-use.html" data-i18n="menu.howto">How to Use</a>
+            <a href="privacy.html" data-i18n="menu.privacy">Privacy Policy</a>
+            <a href="contact.html" data-i18n="menu.contact">Contact</a>
         </nav>
-
     </div>
 
+    <main class="dash-page">
 
-    <!-- Privacy Policy -->
-    <main class="about-page">
+        <div class="dash-head">
+            <img src="./brain.png" alt="Tickwell">
+            <h1 data-i18n="dash.title">لوحة التحكم</h1>
+            <p data-i18n="dash.sub">إحصائيات مذاكرتك وهدفك اليومي</p>
+        </div>
 
-        <img
-            src="./brain.png"
-            alt="Tickwell"
-            class="about-logo"
-        >
+        <!-- Daily Goal -->
+        <section class="card">
+            <h2 data-i18n="dash.goal">🎯 الهدف اليومي</h2>
 
-        <h1>Privacy Policy</h1>
+            <div class="goal-wrap">
 
-        <p>
-            Your privacy is important to us. This Privacy Policy explains
-            how Tickwell handles information when you use our website.
-        </p>
+                <div class="ring" id="ring">
+                    <svg viewBox="0 0 120 120" aria-hidden="true">
+                        <circle class="ring-track" cx="60" cy="60" r="54"></circle>
+                        <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="54"></circle>
+                    </svg>
 
+                    <div class="ring-center">
+                        <div class="ring-pct" id="ringPct">0%</div>
+                        <div data-i18n="dash.ofGoal" class="ring-sub">من الهدف</div>
+                    </div>
+                </div>
 
-        <h2>Information We Collect</h2>
+                <div class="goal-side">
+                    <div class="goal-text" id="goalText"></div>
+                    <div class="goal-msg" id="goalMsg"></div>
 
-        <p>
-            Tickwell is designed to be a simple study timer. We do not
-            require you to create an account or provide personal information
-            to use the main timer features.
-        </p>
+                    <div class="goal-chips" id="goalChips"></div>
 
+                    <label class="goal-custom">
+                        <span data-i18n="dash.orCustom">أو حدد بالدقائق:</span>
+                        <input type="number" id="goalInput" min="5" max="1440" step="5" inputmode="numeric">
+                    </label>
+                </div>
 
-        <h2>Local Storage</h2>
+            </div>
+        </section>
 
-        <p>
-            Tickwell may use your browser's local storage to remember
-            certain preferences, such as your selected theme.
-            This information is stored on your device and is not directly
-            sent to us.
-        </p>
+        <!-- Study Statistics -->
+        <section class="card">
+            <h2 data-i18n="dash.stats">📊 إحصائيات المذاكرة</h2>
 
+            <div class="empty-note" id="emptyNote" data-i18n="dash.empty">
+                لسه مفيش جلسات مسجلة. ابدأ المؤقت وذاكر، وإحصائياتك هتظهر هنا تلقائيًا.
+            </div>
 
-        <h2>Cookies</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+        </section>
 
-        <p>
-            Tickwell does not currently require cookies for the basic
-            operation of the study timer.
-        </p>
+        <!-- Chart -->
+        <section class="card">
+            <div class="chart-head">
+                <h2 data-i18n="dash.chart">📈 وقت المذاكرة</h2>
 
+                <div class="range-toggle" id="rangeToggle">
+                    <button type="button" data-range="7" class="active" data-i18n="dash.range7">7 أيام</button>
+                    <button type="button" data-range="30" data-i18n="dash.range30">30 يوم</button>
+                </div>
+            </div>
 
-        <h2>Third-Party Services</h2>
+            <div dir="ltr">
+                <div class="chart-plot" id="chartPlot"></div>
+                <div class="chart-labels" id="chartLabels"></div>
+            </div>
 
-        <p>
-            Tickwell may use third-party services in the future.
-            If third-party services are added, this Privacy Policy may
-            be updated to explain what information those services may
-            collect and how they are used.
-        </p>
+            <p class="chart-note" data-i18n="dash.chartNote">الخط المتقطع هو هدفك اليومي، والأعمدة الخضراء هي الأيام اللي حققت فيها الهدف.</p>
+        </section>
 
-
-        <h2>Children's Privacy</h2>
-
-        <p>
-            Tickwell is a general-purpose study timer and does not
-            knowingly require children to provide personal information
-            to use the basic features of the website.
-        </p>
-
-
-        <h2>Data Security</h2>
-
-        <p>
-            We aim to keep Tickwell simple and minimize the amount of
-            information required to use the website. Since no website
-            or online service can guarantee complete security, users
-            should avoid submitting unnecessary personal information.
-        </p>
-
-
-        <h2>Changes to This Privacy Policy</h2>
-
-        <p>
-            This Privacy Policy may be updated from time to time if
-            Tickwell's features or services change. Any changes will
-            be published on this page.
-        </p>
-
-
-        <h2>Contact</h2>
-
-        <p>
-            If you have questions about this Privacy Policy or Tickwell,
-            you can contact us through the Contact page.
-        </p>
-
-
-        <p>
-            <strong>Last updated: October 2026</strong>
-        </p>
+        <div class="dash-foot">
+            <span id="dashNote" data-i18n="dash.local">الإحصائيات محفوظة على هذا الجهاز وهذا المتصفح فقط.</span><br>
+            <button type="button" class="danger-button" id="clearButton" data-i18n="dash.clear">مسح كل الإحصائيات</button>
+        </div>
 
     </main>
 
 
     <script>
-
-        /* Remember Theme */
         try {
             if (localStorage.getItem("theme") === "light") {
                 document.body.classList.add("light-mode");
             }
         } catch (e) {}
-        
+
         const menuButton = document.getElementById("menuButton");
-        const dropdownMenu = document.getElementById("dropdownMenu");
         const menuContainer = document.querySelector(".menu-container");
 
         menuButton.addEventListener("click", function (event) {
             event.stopPropagation();
-
             menuContainer.classList.toggle("open");
-
-            const isOpen = menuContainer.classList.contains("open");
-
-            menuButton.setAttribute("aria-expanded", isOpen);
+            menuButton.setAttribute("aria-expanded", menuContainer.classList.contains("open"));
         });
 
         document.addEventListener("click", function (event) {
@@ -193,6 +401,294 @@
             }
         });
     </script>
+
+    <script src="./stats.js"></script>
+
+    <script>
+        (function () {
+
+            const ST = window.TickwellStats;
+            const S = window.TickwellSettings;
+            const $ = (id) => document.getElementById(id);
+
+            const T = (key, vars) => S.t ? S.t(key, vars) : key;
+            const locale = () => S.locale();
+            const STUDIED_SECONDS = 60;       // اليوم يُحسب مذاكرة لو فيه دقيقة على الأقل
+            const GOAL_PRESETS = [60, 120, 180, 240];
+            const CIRCUMFERENCE = 339.292;
+
+            let range = 7;
+
+
+            function fmt(sec) {
+                sec = Math.round(sec);
+
+                const h = Math.floor(sec / 3600);
+                const m = Math.floor((sec % 3600) / 60);
+
+                const uh = T("unit.h");
+                const um = T("unit.m");
+
+                if (h > 0) return m ? `${h}${uh} ${m}${um}` : `${h}${uh}`;
+                if (m > 0) return `${m}${um}`;
+
+                return sec > 0 ? T("lessThanMin") : `0${um}`;
+            }
+
+
+            function keyToDate(key) {
+                const [y, m, d] = key.split("-").map(Number);
+
+                return new Date(y, m - 1, d);
+            }
+
+
+            function sum(days, keys) {
+                return keys.reduce((total, k) => total + (days[k] || 0), 0);
+            }
+
+
+            function calcStreaks(days, today) {
+                const studied = (k) => (days[k] || 0) >= STUDIED_SECONDS;
+
+                /* السلسلة الحالية: لو لسه ماذاكرتش النهارده منكسرش السلسلة */
+                let cursor = studied(today) ? today : ST.addDays(today, -1);
+                let current = 0;
+
+                while (studied(cursor)) {
+                    current++;
+                    cursor = ST.addDays(cursor, -1);
+                }
+
+                /* أطول سلسلة */
+                const keys = Object.keys(days).filter(studied).sort();
+                let best = 0;
+                let run = 0;
+                let prev = null;
+
+                keys.forEach((k) => {
+                    run = prev && ST.addDays(prev, 1) === k ? run + 1 : 1;
+                    best = Math.max(best, run);
+                    prev = k;
+                });
+
+                return { current, best };
+            }
+
+
+            function stat(value, label) {
+                return `<div class="stat"><div class="stat-value">${value}</div><div class="stat-label">${label}</div></div>`;
+            }
+
+
+            function renderGoal(data, todaySec) {
+                const goalSec = data.goal * 60;
+                const pct = goalSec > 0 ? Math.min(100, Math.floor((todaySec / goalSec) * 100)) : 0;
+                const done = todaySec >= goalSec;
+
+                $("ring").classList.toggle("done", done);
+                $("ringFill").style.strokeDashoffset = CIRCUMFERENCE * (1 - pct / 100);
+                $("ringPct").textContent = pct + "%";
+
+                $("goalText").textContent = T("goalOf", { a: fmt(todaySec), b: fmt(goalSec) });
+
+                $("goalMsg").textContent = done
+                    ? T("goal.done")
+                    : T("goal.left", { n: fmt(goalSec - todaySec) });
+
+                const chips = $("goalChips");
+
+                chips.innerHTML = "";
+
+                GOAL_PRESETS.forEach((min) => {
+                    const btn = document.createElement("button");
+
+                    btn.type = "button";
+                    btn.className = "chip" + (data.goal === min ? " active" : "");
+                    btn.textContent = fmt(min * 60);
+
+                    btn.addEventListener("click", () => {
+                        ST.setGoal(min);
+                        render();
+                    });
+
+                    chips.appendChild(btn);
+                });
+
+                const input = $("goalInput");
+
+                if (document.activeElement !== input) {
+                    input.value = data.goal;
+                }
+            }
+
+
+            function renderStats(data, today) {
+                const days = data.days;
+
+                const keys7 = [];
+
+                for (let i = 0; i < 7; i++) keys7.push(ST.addDays(today, -i));
+
+                const monthPrefix = today.slice(0, 7);
+
+                const monthKeys = Object.keys(days).filter((k) => k.startsWith(monthPrefix));
+                const allKeys = Object.keys(days);
+
+                const total = sum(days, allKeys);
+                const studiedDays = allKeys.filter((k) => days[k] >= STUDIED_SECONDS).length;
+                const streaks = calcStreaks(days, today);
+
+                const pomoTotal = Object.values(data.pomos).reduce((a, b) => a + b, 0);
+
+                const avgSession = data.count > 0 ? total / data.count : 0;
+                const avgDay = studiedDays > 0 ? total / studiedDays : 0;
+
+                $("emptyNote").style.display = total === 0 ? "block" : "none";
+
+                $("statsGrid").innerHTML = [
+                    stat(fmt(days[today] || 0), T("st.today")),
+                    stat(fmt(sum(days, keys7)), T("st.week")),
+                    stat(fmt(sum(days, monthKeys)), T("st.month")),
+                    stat(fmt(total), T("st.total")),
+                    stat(`🔥 ${T("st.days", { n: streaks.current })}`, T("st.streak")),
+                    stat(T("st.days", { n: streaks.best }), T("st.best")),
+                    stat(fmt(data.longest), T("st.longest")),
+                    stat(fmt(avgSession), T("st.avgSession")),
+                    stat(fmt(avgDay), T("st.avgDay")),
+                    stat(`🍅 ${pomoTotal}`, T("st.pomos"))
+                ].join("");
+            }
+
+
+            function renderChart(data, today) {
+                const days = data.days;
+                const goalSec = data.goal * 60;
+
+                const keys = [];
+
+                for (let i = range - 1; i >= 0; i--) keys.push(ST.addDays(today, -i));
+
+                const peak = Math.max(goalSec, ...keys.map((k) => days[k] || 0));
+                const scale = (peak || 1) * 1.1;
+
+                const plot = $("chartPlot");
+                const labels = $("chartLabels");
+
+                plot.innerHTML = "";
+                labels.innerHTML = "";
+
+                keys.forEach((k, idx) => {
+                    const sec = days[k] || 0;
+                    const date = keyToDate(k);
+
+                    const col = document.createElement("div");
+                    col.className = "bar-col";
+
+                    const bar = document.createElement("div");
+
+                    bar.className =
+                        "bar" +
+                        (k === today ? " today" : "") +
+                        (goalSec > 0 && sec >= goalSec ? " hit" : "");
+
+                    bar.style.height = sec > 0 ? Math.max(2, (sec / scale) * 100) + "%" : "0";
+
+                    bar.title =
+                        date.toLocaleDateString(locale(), { day: "numeric", month: "long" }) +
+                        ": " + fmt(sec);
+
+                    col.appendChild(bar);
+                    plot.appendChild(col);
+
+                    const label = document.createElement("div");
+
+                    if (range === 7) {
+                        label.textContent = date.toLocaleDateString(locale(), { weekday: "short" });
+                    } else {
+                        label.textContent =
+                            idx % 5 === 0 || k === today ? String(date.getDate()) : "";
+                    }
+
+                    labels.appendChild(label);
+                });
+
+                const line = document.createElement("div");
+
+                line.className = "goal-line";
+                line.style.bottom = (goalSec / scale) * 100 + "%";
+
+                plot.appendChild(line);
+            }
+
+
+            function render() {
+                const data = ST.load();
+                const today = ST.dayKey(Date.now());
+
+                renderGoal(data, data.days[today] || 0);
+                renderStats(data, today);
+                renderChart(data, today);
+            }
+
+
+            /* الهدف المخصص */
+            $("goalInput").addEventListener("change", (event) => {
+                ST.setGoal(event.target.value);
+                render();
+            });
+
+
+            /* مدى الرسم البياني */
+            document.querySelectorAll("#rangeToggle button").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    range = Number(btn.dataset.range);
+
+                    document.querySelectorAll("#rangeToggle button").forEach((b) => {
+                        b.classList.toggle("active", b === btn);
+                    });
+
+                    render();
+                });
+            });
+
+
+            /* مسح الإحصائيات */
+            $("clearButton").addEventListener("click", () => {
+                if (confirm(T("dash.clearConfirm"))) {
+                    ST.clear();
+                    render();
+                }
+            });
+
+
+            /* تحديث تلقائي لو الإحصائيات اتغيرت من تاب تاني */
+            window.addEventListener("storage", (event) => {
+                if (event.key === "tickwellStats") render();
+            });
+
+
+            /* نص الحفظ: على الجهاز فقط أو متزامن مع الحساب */
+            function updateNote() {
+                const note = $("dashNote");
+                const status = window.TickwellSync ? window.TickwellSync.getStatus() : { state: "signedOut" };
+                const key = status.state === "signedOut" ? "dash.local" : "dash.synced";
+
+                note.setAttribute("data-i18n", key);
+                note.textContent = T(key);
+            }
+
+            window.addEventListener("tickwell:settings", () => { render(); updateNote(); });
+            window.addEventListener("tickwell:stats-remote", render);
+            window.addEventListener("tickwell:sync", updateNote);
+
+            updateNote();
+
+            render();
+
+        })();
+    </script>
+
     <script type="module" src="./auth.js"></script>
 
 </body>

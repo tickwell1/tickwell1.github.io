@@ -11,7 +11,7 @@ import {
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
     sendEmailVerification,
-    signOut
+    signOut as firebaseSignOut
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -30,9 +30,19 @@ export {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
-    sendEmailVerification,
-    signOut
+    sendEmailVerification
 };
+
+/* تسجيل الخروج: الأول نرفع آخر تغييرات المزامنة ونمسح بيانات الجهاز */
+export async function signOut(authInstance) {
+    try {
+        if (window.TickwellSync && window.TickwellSync.beforeLogout) {
+            await window.TickwellSync.beforeLogout();
+        }
+    } catch (e) {}
+
+    return firebaseSignOut(authInstance);
+}
 
 /* إضافة رابط Login / Logout تلقائياً في القائمة */
 function updateMenu(user) {
@@ -46,8 +56,11 @@ function updateMenu(user) {
         menu.appendChild(link);
     }
 
+    const T = (key, fallback) =>
+        window.TickwellSettings ? window.TickwellSettings.t(key) : fallback;
+
     if (user) {
-        link.textContent = "Logout";
+        link.textContent = T("menu.logout", "Logout");
         link.title = user.email;
         link.href = "#";
         link.onclick = async (e) => {
@@ -55,7 +68,7 @@ function updateMenu(user) {
             await signOut(auth);
         };
     } else {
-        link.textContent = "Login";
+        link.textContent = T("menu.login", "Login");
         link.title = "";
         link.href = "login.html";
         link.onclick = null;
@@ -63,3 +76,9 @@ function updateMenu(user) {
 }
 
 onAuthStateChanged(auth, updateMenu);
+
+/* لو اللغة اتغيرت نحدّث نص الرابط */
+window.addEventListener("tickwell:settings", () => updateMenu(auth.currentUser));
+
+/* المزامنة مع الحساب */
+import("./sync.js").catch((error) => console.warn("Tickwell sync unavailable:", error));

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page data-rtl data-title-key="title.howto">
 <head>
     <link rel="canonical" href="https://tickwell1.github.io/how-to-use.html">
     <!-- Google tag (gtag.js) -->
@@ -25,6 +25,16 @@
 
     <link rel="icon" type="image/png" href="./brain.png">
 
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tickwell">
+
+    <script src="./settings.js"></script>
+    <script src="./stats.js"></script>
+
     <link rel="stylesheet" href="./style.css">
 </head>
 
@@ -36,7 +46,7 @@
         <button
             class="menu-button"
             id="menuButton"
-            aria-label="Open menu"
+            aria-label="Open menu" data-i18n-aria="menu.open"
             aria-expanded="false"
         >
             <span class="arrow">▼</span>
@@ -44,15 +54,19 @@
 
         <nav class="dropdown-menu" id="dropdownMenu">
 
-            <a href="index.html">Home</a>
+            <a href="index.html" data-i18n="menu.home">Home</a>
 
-            <a href="about.html">About Tickwell</a>
+            <a href="dashboard.html" data-i18n="menu.dashboard">Dashboard</a>
 
-            <a href="how-to-use.html">How to Use</a>
+            <a href="settings.html" data-i18n="menu.settings">Settings</a>
 
-            <a href="privacy.html">Privacy Policy</a>
+            <a href="about.html" data-i18n="menu.about">About Tickwell</a>
 
-            <a href="contact.html">Contact</a>
+            <a href="how-to-use.html" data-i18n="menu.howto">How to Use</a>
+
+            <a href="privacy.html" data-i18n="menu.privacy">Privacy Policy</a>
+
+            <a href="contact.html" data-i18n="menu.contact">Contact</a>
 
         </nav>
 
@@ -68,70 +82,81 @@
             class="about-logo"
         >
 
-        <h1>How to Use Tickwell</h1>
+        <h1 data-i18n="howto.0">How to Use Tickwell</h1>
 
-        <p>
+        <p data-i18n="howto.1">
             Tickwell is designed to make studying simple and focused.
             Follow these steps to start using the timer.
         </p>
 
 
-        <h2>1. Start the Timer</h2>
+        <h2 data-i18n="howto.2">1. Start the Timer</h2>
 
-        <p>
+        <p data-i18n-html="howto.3">
             Open Tickwell and press the <strong>Start</strong> button
             to begin your study session.
         </p>
 
 
-        <h2>2. Focus on Your Work</h2>
+        <h2 data-i18n="howto.4">2. Focus on Your Work</h2>
 
-        <p>
+        <p data-i18n="howto.5">
             Once the timer starts, focus on your study, reading,
             homework, or any task you want to complete.
         </p>
 
 
-        <h2>3. Pause the Timer</h2>
+        <h2 data-i18n="howto.6">3. Pause the Timer</h2>
 
-        <p>
+        <p data-i18n-html="howto.7">
             Press the <strong>Stop</strong> button whenever you want
             to pause your study session.
         </p>
 
 
-        <h2>4. Reset the Timer</h2>
+        <h2 data-i18n="howto.8">4. Reset the Timer</h2>
 
-        <p>
+        <p data-i18n-html="howto.9">
             Press the <strong>Reset</strong> button to return the timer
             to 00:00:00 and start a new session.
         </p>
 
 
-        <h2>5. Change the Theme</h2>
+        <h2 data-i18n="howto.10">5. Change the Theme</h2>
 
-        <p>
+        <p data-i18n="howto.11">
             Use the theme button to switch between Dark Mode and
             Bright Mode according to your preference.
         </p>
 
 
-        <h2>6. Use Fullscreen Mode</h2>
+        <h2 data-i18n="howto.12">6. Use Fullscreen Mode</h2>
 
-        <p>
+        <p data-i18n="howto.13">
             Press the fullscreen button to make the timer fill the
             screen and reduce distractions while studying.
         </p>
 
 
-        <h2>Study Tips</h2>
+                <h2 data-i18n="howto.14">7. Keyboard Shortcuts</h2>
 
-        <p>
+        <p data-i18n-html="howto.15">
+            On a computer, you can control Tickwell from the keyboard:
+            <strong>Space</strong> to start or pause, <strong>Shift + R</strong>
+            to reset, <strong>F</strong> for fullscreen, <strong>T</strong> to
+            change the theme, <strong>M</strong> to switch between Stopwatch and
+            Pomodoro, and <strong>?</strong> to show the list of shortcuts.
+        </p>
+
+
+        <h2 data-i18n="howto.16">Study Tips</h2>
+
+        <p data-i18n="howto.17">
             Choose a specific task before starting the timer and try
             to stay focused until your study session is finished.
         </p>
 
-        <p>
+        <p data-i18n="howto.18">
             You can use Tickwell for short study sessions or longer
             periods depending on your schedule.
         </p>
@@ -175,6 +200,7 @@
             }
         });
     </script>
+
     <script type="module" src="./auth.js"></script>
 
 </body>

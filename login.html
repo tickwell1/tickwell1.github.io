@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-i18n-page data-rtl data-title-key="title.login">
 <head>
     <link rel="canonical" href="https://tickwell1.github.io/login.html">
     <!-- Google tag (gtag.js) -->
@@ -16,6 +16,16 @@
     <meta name="author" content="Hesham Khaled">
     <title>Login - Tickwell</title>
     <link rel="icon" type="image/png" href="./brain.png">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Tickwell">
+
+    <script src="./settings.js"></script>
+    <script src="./stats.js"></script>
+
     <link rel="stylesheet" href="./style.css">
 
     <style>
@@ -34,6 +44,7 @@
         }
 
         .auth-tabs {
+            direction: ltr;
             position: relative;
             display: flex;
             gap: 6px;
@@ -87,7 +98,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            text-align: left;
+            text-align: start;
         }
 
         .auth-form label { font-weight: bold; font-size: 15px; }
@@ -146,7 +157,7 @@
             padding: 14px;
             border-radius: 10px;
             line-height: 1.6;
-            text-align: left;
+            text-align: start;
         }
 
         .auth-note.error {
@@ -197,16 +208,20 @@
 
     <!-- Tickwell Menu -->
     <div class="menu-container">
-        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" aria-expanded="false">
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open menu" data-i18n-aria="menu.open" aria-expanded="false">
             <span class="arrow">▼</span>
         </button>
 
         <nav class="dropdown-menu" id="dropdownMenu">
-            <a href="index.html">Home</a>
-            <a href="about.html">About Tickwell</a>
-            <a href="how-to-use.html">How to Use</a>
-            <a href="privacy.html">Privacy Policy</a>
-            <a href="contact.html">Contact</a>
+            <a href="index.html" data-i18n="menu.home">Home</a>
+
+            <a href="dashboard.html" data-i18n="menu.dashboard">Dashboard</a>
+
+            <a href="settings.html" data-i18n="menu.settings">Settings</a>
+            <a href="about.html" data-i18n="menu.about">About Tickwell</a>
+            <a href="how-to-use.html" data-i18n="menu.howto">How to Use</a>
+            <a href="privacy.html" data-i18n="menu.privacy">Privacy Policy</a>
+            <a href="contact.html" data-i18n="menu.contact">Contact</a>
         </nav>
     </div>
 
@@ -221,18 +236,18 @@
 
             <div class="auth-tabs" id="authTabs" role="tablist">
                 <span class="tab-indicator" aria-hidden="true"></span>
-                <button type="button" id="tabLogin" class="active" role="tab" aria-selected="true">Log in</button>
-                <button type="button" id="tabSignup" role="tab" aria-selected="false">Create account</button>
+                <button type="button" id="tabLogin" class="active" role="tab" aria-selected="true" data-i18n="login.tabLogin">Log in</button>
+                <button type="button" id="tabSignup" role="tab" aria-selected="false" data-i18n="login.tabSignup">Create account</button>
             </div>
 
             <form class="auth-form" id="authForm" novalidate>
-                <label for="email">Email</label>
+                <label for="email" data-i18n="login.email">Email</label>
                 <input type="email" id="email" autocomplete="email" placeholder="you@example.com" required>
 
-                <label for="password">Password</label>
-                <input type="password" id="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required>
+                <label for="password" data-i18n="login.password">Password</label>
+                <input type="password" id="password" autocomplete="current-password" placeholder="At least 6 characters" data-i18n-placeholder="login.passPh" minlength="6" required>
 
-                <button type="button" class="link-button" id="forgotButton">Forgot your password?</button>
+                <button type="button" class="link-button" id="forgotButton" data-i18n="login.forgot">Forgot your password?</button>
 
                 <button type="submit" class="auth-submit" id="submitButton">Log in</button>
             </form>
@@ -240,12 +255,12 @@
 
         <!-- Logged in -->
         <section class="signed-in" id="signedIn">
-            <h1>You're logged in</h1>
-            <p class="auth-sub">Signed in as</p>
+            <h1 data-i18n="login.signedTitle">You're logged in</h1>
+            <p class="auth-sub" data-i18n="login.signedAs">Signed in as</p>
             <p class="email" id="userEmail"></p>
             <div class="actions">
-                <a href="index.html">Back to timer</a>
-                <button type="button" id="logoutButton">Log out</button>
+                <a href="index.html" data-i18n="login.back">Back to timer</a>
+                <button type="button" id="logoutButton" data-i18n="login.logout">Log out</button>
             </div>
         </section>
 
@@ -296,6 +311,7 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
         const $ = (id) => document.getElementById(id);
+        const T = (key, vars) => window.TickwellSettings.t(key, vars);
 
         let mode = "login"; // "login" | "signup"
 
@@ -312,16 +328,16 @@
 
         function friendlyError(code) {
             switch (code) {
-                case "auth/invalid-email": return "That email address isn't valid.";
-                case "auth/missing-password": return "Enter your password.";
-                case "auth/weak-password": return "Password must be at least 6 characters.";
-                case "auth/email-already-in-use": return "An account with this email already exists. Try logging in.";
+                case "auth/invalid-email": return T("err.invalidEmail");
+                case "auth/missing-password": return T("err.missingPassword");
+                case "auth/weak-password": return T("err.weak");
+                case "auth/email-already-in-use": return T("err.inUse");
                 case "auth/invalid-credential":
                 case "auth/wrong-password":
-                case "auth/user-not-found": return "Incorrect email or password.";
-                case "auth/too-many-requests": return "Too many attempts. Wait a few minutes and try again.";
-                case "auth/network-request-failed": return "Network error. Check your connection and try again.";
-                default: return "Something went wrong. Please try again.";
+                case "auth/user-not-found": return T("err.badCreds");
+                case "auth/too-many-requests": return T("err.tooMany");
+                case "auth/network-request-failed": return T("err.network");
+                default: return T("err.generic");
             }
         }
 
@@ -335,11 +351,9 @@
             $("tabLogin").setAttribute("aria-selected", String(!signup));
             $("tabSignup").setAttribute("aria-selected", String(signup));
 
-            $("authTitle").textContent = signup ? "Create your account" : "Welcome back";
-            $("authSub").textContent = signup
-                ? "Sign up with your email to get started."
-                : "Log in to your Tickwell account.";
-            $("submitButton").textContent = signup ? "Create account" : "Log in";
+            $("authTitle").textContent = signup ? T("login.createTitle") : T("login.welcome");
+            $("authSub").textContent = signup ? T("login.createSub") : T("login.sub");
+            $("submitButton").textContent = signup ? T("login.submitSignup") : T("login.submitLogin");
             $("forgotButton").style.display = signup ? "none" : "block";
             $("password").autocomplete = signup ? "new-password" : "current-password";
             hideNote();
@@ -356,14 +370,14 @@
             const password = $("password").value;
 
             if (!email || !password) {
-                showNote("Enter your email and password.", "error");
+                showNote(T("err.fields"), "error");
                 return;
             }
 
             const button = $("submitButton");
             const label = button.textContent;
             button.disabled = true;
-            button.textContent = mode === "signup" ? "Creating..." : "Logging in...";
+            button.textContent = mode === "signup" ? T("login.creating") : T("login.loggingIn");
 
             try {
                 if (mode === "signup") {
@@ -385,13 +399,13 @@
             const email = $("email").value.trim();
 
             if (!email) {
-                showNote("Enter your email above, then select \"Forgot your password?\" again.", "error");
+                showNote(T("err.needEmail"), "error");
                 return;
             }
 
             try {
                 await sendPasswordResetEmail(auth, email);
-                showNote("If an account exists for this email, a reset link is on its way.", "ok");
+                showNote(T("ok.reset"), "ok");
             } catch (error) {
                 showNote(friendlyError(error.code), "error");
             }
@@ -404,6 +418,8 @@
             $("signedIn").style.display = user ? "block" : "none";
             if (user) $("userEmail").textContent = user.email;
         });
+
+        window.addEventListener("tickwell:settings", () => setMode(mode));
 
         setMode("login");
     </script>

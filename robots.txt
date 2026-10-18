@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hishamkhaledmon.github.io/sitemap.xml
+Sitemap: https://tickwell1.github.io/sitemap.xml

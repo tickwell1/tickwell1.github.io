@@ -3,22 +3,25 @@
 
 <head>
     <link rel="canonical" href="https://tickwell1.github.io/">
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5FERLLMF79"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-5FERLLMF79');
-    </script>
+    <script src="./consent.js"></script>
     <meta name="google-site-verification" content="UVkdKxEYHDcF2PPXxmQgQDTb6QHR9PxSx6GpxJpBNoA" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <meta name="description" content="Tickwell - مؤقت مذاكرة مجاني يساعدك على التركيز وتنظيم وقت الدراسة باستخدام عداد بسيط وسريع لجلسات المذاكرة، مناسب للطلاب والعمل والدراسة اليومية.">
 
-    <meta name="keywords" content="study, timer, Tickwell, well, Study Hours Tracker">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Tickwell">
+    <meta property="og:title" content="Tickwell - study with timer">
+    <meta property="og:description" content="Tickwell - مؤقت مذاكرة مجاني يساعدك على التركيز وتنظيم وقت الدراسة باستخدام عداد بسيط وسريع لجلسات المذاكرة، مناسب للطلاب والعمل والدراسة اليومية.">
+    <meta property="og:url" content="https://tickwell1.github.io/">
+    <meta property="og:image" content="https://tickwell1.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Tickwell - study timer">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="keywords" content="study timer, Pomodoro, Tickwell, study hours tracker, مؤقت مذاكرة, بومودورو">
 
     <meta name="author" content="Hesham Khaled">
 
@@ -35,7 +38,35 @@
 
     <script src="./settings.js"></script>
 
+    <link rel="preload" href="./anton-timer.woff2" as="font" type="font/woff2" crossorigin>
+
     <link rel="stylesheet" href="./style.css">
+
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Tickwell",
+    "url": "https://tickwell1.github.io/",
+    "description": "Free study timer with a stopwatch, Pomodoro mode, daily goals and statistics.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "inLanguage": [
+        "ar",
+        "en"
+    ],
+    "image": "https://tickwell1.github.io/og-image.png",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Hesham Khaled"
+    }
+}
+    </script>
 
 </head>
 
@@ -123,6 +154,30 @@
     </div>
 
 
+    <!-- Subject -->
+    <div class="subject-wrap" data-lang-dir>
+
+        <div class="subject-anchor">
+
+            <button
+                type="button"
+                class="subject-button"
+                id="subjectButton"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+            >
+                <span class="subject-dot" id="subjectDot"></span>
+                <span class="subject-name" id="subjectName">بدون مادة</span>
+                <span class="subject-chevron" aria-hidden="true"></span>
+            </button>
+
+            <div class="subject-menu" id="subjectMenu" role="listbox" hidden></div>
+
+        </div>
+
+    </div>
+
+
     <!-- Pomodoro Info -->
     <div class="pomo-info" id="pomoInfo" data-phase="focus">
 
@@ -132,6 +187,8 @@
 
     </div>
 
+
+    <div class="fs-subject" id="fsSubject"><span class="subject-dot" id="fsDot"></span><span id="fsName"></span></div>
 
     <div class="timer">00:00:00</div>
 
@@ -164,6 +221,37 @@
         </button>
 
     </div>
+
+
+    <div class="buttons-spacer" id="buttonsSpacer"></div>
+
+
+    <!-- Site description (SEO) -->
+    <footer class="home-footer" data-lang-dir>
+        <p>
+            <strong>Tickwell</strong>
+            <span data-i18n="home.foot">مؤقت مذاكرة مجاني بنظام بومودورو وساعة إيقاف، مع إحصائيات وهدف يومي.</span>
+            <a href="about.html" data-i18n="home.footLink">تعرّف على Tickwell</a>
+        </p>
+    </footer>
+
+    <noscript>
+        <p style="text-align: center; margin: 40px 16px;">
+            Tickwell needs JavaScript to run. &mdash; يحتاج Tickwell إلى تفعيل جافاسكريبت ليعمل.
+        </p>
+    </noscript>
+
+
+    <!-- Exit soft fullscreen (iPhone etc.) -->
+    <button
+        type="button"
+        class="exit-fs"
+        id="exitFullscreen"
+        aria-label="خروج من ملء الشاشة"
+        data-i18n-aria="fullscreen.exit"
+    >
+        ✕
+    </button>
 
 
     <!-- Keyboard Shortcuts -->
@@ -206,10 +294,36 @@
     </div>
 
 
+    <!-- Break-end alarm -->
+    <div
+        class="alarm-overlay"
+        id="alarmOverlay"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="alarmTitle"
+    >
+
+        <div class="alarm-panel">
+
+            <div class="alarm-icon" aria-hidden="true">⏰</div>
+
+            <h2 id="alarmTitle" data-i18n="alarm.title">انتهت الراحة!</h2>
+
+            <p data-i18n="alarm.text">جاهز ترجع للتركيز؟</p>
+
+            <button type="button" class="alarm-button" id="alarmDismiss" data-i18n="alarm.here">أنا هنا</button>
+
+        </div>
+
+    </div>
+
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 
     <script src="./stats.js"></script>
+
+    <script src="./achievements.js"></script>
 
     <script src="./script.js"></script>
 

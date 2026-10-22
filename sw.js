@@ -1,6 +1,6 @@
 /* Tickwell Service Worker - يخلي الموقع يشتغل بدون إنترنت */
 
-const CACHE = "tickwell-v1";   // غيّر الرقم لما تعمل تحديث كبير
+const CACHE = "tickwell-v9";   // غيّر الرقم لما تعمل تحديث كبير
 
 const CORE = [
     "./",
@@ -15,14 +15,17 @@ const CORE = [
     "style.css",
     "script.js",
     "stats.js",
+    "achievements.js",
     "settings.js",
+    "consent.js",
     "auth.js",
     "sync.js",
     "manifest.webmanifest",
     "brain.png",
     "brain-192.png",
     "brain-512.png",
-    "apple-touch-icon.png"
+    "apple-touch-icon.png",
+    "anton-timer.woff2"
 ];
 
 

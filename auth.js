@@ -11,7 +11,10 @@ import {
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
     sendEmailVerification,
-    signOut as firebaseSignOut
+    signOut as firebaseSignOut,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
+    deleteUser
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -33,6 +36,33 @@ export {
     sendEmailVerification
 };
 
+/* حذف الحساب نهائيًا: تأكيد كلمة السر ثم مسح بيانات السحابة ثم الحساب */
+async function deleteAccount(password) {
+    const user = auth.currentUser;
+
+    if (!user) throw new Error("not-signed-in");
+
+    await reauthenticateWithCredential(
+        user,
+        EmailAuthProvider.credential(user.email, password)
+    );
+
+    if (window.TickwellSync && window.TickwellSync.deleteCloudData) {
+        await window.TickwellSync.deleteCloudData();
+    }
+
+    await deleteUser(user);
+
+    try {
+        localStorage.removeItem("tickwellSyncUid");
+    } catch (e) {}
+
+    if (window.TickwellStats) window.TickwellStats.wipeLocal();
+}
+
+window.TickwellAuth = { deleteAccount };
+
+
 /* تسجيل الخروج: الأول نرفع آخر تغييرات المزامنة ونمسح بيانات الجهاز */
 export async function signOut(authInstance) {
     try {
@@ -46,6 +76,14 @@ export async function signOut(authInstance) {
 
 /* إضافة رابط Login / Logout تلقائياً في القائمة */
 function updateMenu(user) {
+    /* زر Login اللي فوق: يختفي لو مسجّل دخول (والتلميح بيتحفظ عشان الصفحة الجاية) */
+    try {
+        localStorage.setItem("tickwellAuthHint", user ? "in" : "out");
+    } catch (e) {}
+
+    const loginButton = document.getElementById("loginButton");
+    if (loginButton) loginButton.hidden = !!user;
+
     const menu = document.getElementById("dropdownMenu");
     if (!menu) return;
 

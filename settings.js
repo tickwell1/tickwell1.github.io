@@ -15,18 +15,28 @@
             short: 15,
             long: 15,
             sessions: 4,         // جلسات التركيز قبل الراحة الطويلة
-            auto: true           // بدء المرحلة التالية تلقائياً
+            auto: true,          // بدء المرحلة التالية تلقائياً
+            alarm: true          // منبه نهاية الراحة (يرن لحد ما تضغط "أنا هنا")
         },
         sound: true,
         volume: 0.6,             // 0 - 1
         notifications: true,
         wakeLock: true,
         shortcuts: true,
+        subjects: [],            // قايمة المواد (بتتزامن)
+        subjectColors: {},       // لون كل مادة (بيتزامن)
+        subject: "",             // المادة المختارة على هذا الجهاز
         updatedAt: 0             // وقت آخر تغيير في الإعدادات المتزامنة
     };
 
     /* الإعدادات اللي بتتزامن مع الحساب (الباقي خاص بكل جهاز) */
-    const SYNCED = ["lang", "theme", "pomo", "sound", "volume"];
+    const SYNCED = ["lang", "theme", "pomo", "sound", "volume", "subjects", "subjectColors"];
+
+    /* ألوان المواد */
+    const SUBJECT_PALETTE = [
+        "#4ade80", "#60a5fa", "#f59e0b", "#f472b6",
+        "#a78bfa", "#2dd4bf", "#fb7185", "#facc15"
+    ];
 
 
     /* ========================= */
@@ -498,6 +508,240 @@
 });
 
 
+    /* المنبه */
+    Object.assign(DICT.ar, {
+        "set.test": "تجربة صوت التركيز",
+        "set.testAlarm": "تجربة المنبه",
+        "set.alarm": "منبه نهاية الراحة",
+        "set.alarmHint": "يرنّ باستمرار لحد ما تضغط \"أنا هنا\"، وبعدها تبدأ جلسة التركيز.",
+        "alarm.title": "انتهت الراحة!",
+        "alarm.text": "جاهز ترجع للتركيز؟",
+        "alarm.here": "أنا هنا"
+});
+
+    Object.assign(DICT.en, {
+        "set.test": "Test focus sound",
+        "set.testAlarm": "Test alarm",
+        "set.alarm": "Break-end alarm",
+        "set.alarmHint": "Rings until you press \"I'm here\", then the focus session starts.",
+        "alarm.title": "Break's over!",
+        "alarm.text": "Ready to get back to focus?",
+        "alarm.here": "I'm here"
+});
+
+
+    /* الخصوصية وحذف الحساب */
+    Object.assign(DICT.ar, {
+        "consent.text": "نستخدم Google Analytics لفهم كيفية استخدام الموقع وتحسينه. هل توافق على ملفات تعريف الارتباط (الكوكيز) الخاصة به؟",
+        "consent.accept": "موافق",
+        "consent.decline": "رفض",
+        "consent.more": "سياسة الخصوصية",
+        "set.analytics": "التحليلات (Google Analytics)",
+        "set.analyticsHint": "تساعدنا في معرفة كيف يُستخدم الموقع. تقدر تغيّر اختيارك في أي وقت.",
+        "sec.privacy": "الخصوصية",
+        "acct.delete": "حذف حسابي",
+        "acct.deleteHint": "يحذف حسابك وكل بياناتك المتزامنة نهائيًا ولا يمكن التراجع.",
+        "acct.confirmTitle": "حذف الحساب نهائيًا؟",
+        "acct.confirmText": "اكتب كلمة السر لتأكيد حذف حسابك وكل بياناتك المحفوظة في السحابة. ستُمسح الإحصائيات من هذا الجهاز أيضًا، فصدّر بياناتك أولًا لو عايز نسخة.",
+        "acct.password": "كلمة السر",
+        "acct.confirmBtn": "احذف حسابي نهائيًا",
+        "acct.cancel": "إلغاء",
+        "acct.wrong": "كلمة السر غير صحيحة.",
+        "acct.error": "تعذّر حذف الحساب. حاول مرة أخرى.",
+        "acct.deleted": "تم حذف حسابك.",
+        "privacy.3": "يمكنك استخدام المؤقت الرئيسي دون إنشاء حساب. إذا اخترت إنشاء حساب، فنحن نجمع عنوان البريد الإلكتروني الذي تسجّل به، وتتم معالجة كلمة السر عبر خدمة Firebase Authentication (وهي خدمة من Google). وعند تسجيل الدخول، تُحفظ إحصائيات مذاكرتك وبعض تفضيلاتك (اللغة والوضع ومدد بومودورو وإعدادات الصوت) في حسابك باستخدام Google Cloud Firestore لتتم مزامنتها بين أجهزتك، ويمكنك حذف حسابك وكل بياناتك المتزامنة في أي وقت من صفحة الإعدادات. وإذا أرسلت رسالة عبر صفحة التواصل، فإن اسمك وبريدك الإلكتروني ورسالتك تصلنا عبر خدمة Formspree.",
+        "privacy.7": "لا يتطلب Tickwell ملفات تعريف ارتباط للتشغيل الأساسي لمؤقت المذاكرة. أما Google Analytics، الذي نستخدمه لفهم كيفية استخدام الموقع، فلا يتم تحميله إلا إذا وافقت عليه في إشعار الكوكيز، وقد يضع ملفات تعريف ارتباط في متصفحك. ويمكنك تغيير اختيارك في أي وقت من صفحة الإعدادات."
+});
+
+    Object.assign(DICT.en, {
+        "consent.text": "We use Google Analytics to understand how the site is used and to improve it. Do you accept its cookies?",
+        "consent.accept": "Accept",
+        "consent.decline": "Decline",
+        "consent.more": "Privacy Policy",
+        "set.analytics": "Analytics (Google Analytics)",
+        "set.analyticsHint": "Helps us understand how the site is used. You can change your choice at any time.",
+        "sec.privacy": "Privacy",
+        "acct.delete": "Delete my account",
+        "acct.deleteHint": "Permanently deletes your account and all synced data. This can't be undone.",
+        "acct.confirmTitle": "Delete your account permanently?",
+        "acct.confirmText": "Enter your password to confirm deleting your account and all data saved in the cloud. Your statistics will also be removed from this device, so export your data first if you want a copy.",
+        "acct.password": "Password",
+        "acct.confirmBtn": "Delete my account permanently",
+        "acct.cancel": "Cancel",
+        "acct.wrong": "Incorrect password.",
+        "acct.error": "Couldn't delete the account. Please try again.",
+        "acct.deleted": "Your account was deleted.",
+        "privacy.3": "You can use the main timer without creating an account. If you choose to create an account, we collect the email address you register with, and your password is handled by Firebase Authentication (a Google service). If you sign in, your study statistics and some preferences (language, theme, Pomodoro durations, and sound settings) are stored in your account using Google Cloud Firestore so they can sync across your devices, and you can delete your account and all synced data at any time from the Settings page. If you send a message through the Contact page, your name, email address, and message are sent to us through Formspree.",
+        "privacy.7": "Tickwell does not require cookies for the basic operation of the study timer. Google Analytics, which we use to understand how the website is used, is loaded only if you accept it in the cookie notice, and it may set cookies in your browser. You can change your choice at any time on the Settings page."
+});
+
+
+    /* الصفحة الرئيسية و404 وأقسام طريقة الاستخدام الجديدة */
+    Object.assign(DICT.ar, {
+        "home.h2": "عن مؤقت المذاكرة Tickwell",
+        "home.p1": "Tickwell مؤقت مذاكرة مجاني وبسيط يساعدك على التركيز وتنظيم وقتك. استخدمه كساعة إيقاف لتتبّع وقت مذاكرتك، أو بنظام بومودورو (فترة تركيز ثم راحة) للحفاظ على نشاطك، من غير إعلانات مزعجة ولا تسجيل إجباري.",
+        "home.q1": "ما هي طريقة بومودورو؟",
+        "home.a1": "طريقة لتنظيم الوقت تقوم على فترات تركيز قصيرة تتبعها راحة قصيرة، وبعد عدة جلسات تأتي راحة أطول. في Tickwell الافتراضي هو 45 دقيقة تركيز و15 دقيقة راحة، ويمكنك تغيير المدد من الإعدادات.",
+        "home.q2": "هل Tickwell مجاني؟",
+        "home.a2": "نعم، مجاني بالكامل ويعمل من المتصفح مباشرة. إنشاء حساب اختياري، وفائدته الوحيدة مزامنة إحصائياتك وإعداداتك بين أجهزتك.",
+        "home.q3": "هل يعمل بدون إنترنت؟",
+        "home.a3": "نعم. يمكنك تثبيت Tickwell كتطبيق من صفحة الإعدادات، فيعمل المؤقت حتى بدون اتصال بالإنترنت.",
+        "home.q4": "كيف أتابع تقدّمي في المذاكرة؟",
+        "home.a4": "من لوحة التحكم تشاهد وقت مذاكرتك اليوم وهذا الأسبوع وهذا الشهر، وعدد الأيام المتتالية التي ذاكرت فيها، وتقدّمك نحو هدفك اليومي.",
+        "e404.title": "الصفحة غير موجودة",
+        "e404.text": "الرابط الذي فتحته غير موجود أو تم نقله.",
+        "e404.home": "العودة للرئيسية",
+        "title.404": "الصفحة غير موجودة - Tickwell",
+        "howto.n1": "8. وضع بومودورو",
+        "howto.n2": "بدّل إلى وضع بومودورو من المفتاح الموجود فوق المؤقت. يعدّ Tickwell وقت التركيز تنازليًا (45 دقيقة افتراضيًا) ثم وقت الراحة. عند انتهاء التركيز يصدر صوت جرس، وعند انتهاء الراحة يرنّ منبه حتى تضغط زر <strong>أنا هنا</strong>. ويمكنك تغيير المدد من الإعدادات.",
+        "howto.n3": "9. لوحة التحكم والهدف اليومي",
+        "howto.n4": "افتح لوحة التحكم من القائمة لتشاهد وقت مذاكرتك اليوم وهذا الأسبوع وهذا الشهر، وعدد الأيام المتتالية، وتقدّمك نحو هدفك اليومي الذي تحدده بنفسك.",
+        "howto.n5": "10. الإعدادات والمزامنة",
+        "howto.n6": "من الإعدادات يمكنك التبديل بين العربية والإنجليزية، واختيار الوضع الداكن أو الساطع أو التلقائي، وضبط الصوت والإشعارات، وتثبيت Tickwell كتطبيق. وسجّل الدخول ببريدك الإلكتروني لمزامنة إحصائياتك بين كل أجهزتك."
+});
+
+    Object.assign(DICT.en, {
+        "home.h2": "About the Tickwell study timer",
+        "home.p1": "Tickwell is a free, simple study timer that helps you focus and organize your time. Use it as a stopwatch to track your study time, or with the Pomodoro method (a focus period followed by a break) to stay fresh, with no annoying ads and no required sign-up.",
+        "home.q1": "What is the Pomodoro method?",
+        "home.a1": "A time-management method built on short focus periods followed by short breaks, with a longer break after a few sessions. In Tickwell the default is 45 minutes of focus and 15 minutes of break, and you can change the durations in Settings.",
+        "home.q2": "Is Tickwell free?",
+        "home.a2": "Yes, it is completely free and runs directly in your browser. Creating an account is optional and only lets you sync your statistics and settings across your devices.",
+        "home.q3": "Does it work offline?",
+        "home.a3": "Yes. You can install Tickwell as an app from the Settings page, and the timer keeps working even without an internet connection.",
+        "home.q4": "How do I track my progress?",
+        "home.a4": "The Dashboard shows your study time for today, this week and this month, your streak of consecutive study days, and your progress toward your daily goal.",
+        "e404.title": "Page not found",
+        "e404.text": "The page you opened doesn't exist or has moved.",
+        "e404.home": "Back to home",
+        "title.404": "Page not found - Tickwell",
+        "howto.n1": "8. Pomodoro Mode",
+        "howto.n2": "Switch to Pomodoro mode with the toggle above the timer. Tickwell counts down your focus time (45 minutes by default) and then your break. A chime plays when focus ends, and an alarm rings at the end of the break until you press <strong>I'm here</strong>. You can change the durations in Settings.",
+        "howto.n3": "9. Dashboard & Daily Goal",
+        "howto.n4": "Open the Dashboard from the menu to see your study time for today, this week and this month, your streak of consecutive days, and your progress toward the daily goal you set.",
+        "howto.n5": "10. Settings & Sync",
+        "howto.n6": "In Settings you can switch between Arabic and English, choose a dark, light or automatic theme, adjust sounds and notifications, and install Tickwell as an app. Log in with your email to sync your statistics across all your devices."
+});
+
+
+    /* المواد وملء الشاشة */
+    Object.assign(DICT.ar, {
+        "subject.label": "المادة",
+        "subject.none": "بدون مادة",
+        "subject.add": "＋ مادة جديدة",
+        "subject.placeholder": "اسم المادة ثم Enter",
+        "subject.locked": "أوقف المؤقت لتغيير المادة",
+        "fullscreen.exit": "خروج من ملء الشاشة",
+        "dash.subjects": "📚 الوقت حسب المادة",
+        "dash.subjectsEmpty": "لسه مفيش مواد مسجلة. اختار مادة من الصفحة الرئيسية قبل ما تبدأ المؤقت، وهتظهر هنا.",
+        "dash.untagged": "بدون مادة",
+        "sec.subjects": "المواد",
+        "set.subjectsHint": "أضف موادك واختار منها قبل تشغيل المؤقت، وهتشوف وقت كل مادة في لوحة التحكم. حذف مادة لا يمسح وقتها القديم.",
+        "set.subjectName": "اسم المادة",
+        "set.addSubject": "إضافة",
+        "set.removeSubject": "حذف المادة",
+        "set.subjectsEmpty": "لسه مفيش مواد.",
+        "privacy.3": "يمكنك استخدام المؤقت الرئيسي دون إنشاء حساب. إذا اخترت إنشاء حساب، فنحن نجمع عنوان البريد الإلكتروني الذي تسجّل به، وتتم معالجة كلمة السر عبر خدمة Firebase Authentication (وهي خدمة من Google). وعند تسجيل الدخول، تُحفظ إحصائيات مذاكرتك وبعض تفضيلاتك (اللغة والوضع ومدد بومودورو وإعدادات الصوت وأسماء المواد التي تنشئها) في حسابك باستخدام Google Cloud Firestore لتتم مزامنتها بين أجهزتك، ويمكنك حذف حسابك وكل بياناتك المتزامنة في أي وقت من صفحة الإعدادات. وإذا أرسلت رسالة عبر صفحة التواصل، فإن اسمك وبريدك الإلكتروني ورسالتك تصلنا عبر خدمة Formspree."
+});
+
+    Object.assign(DICT.en, {
+        "subject.label": "Subject",
+        "subject.none": "No subject",
+        "subject.add": "+ New subject",
+        "subject.placeholder": "Subject name, then Enter",
+        "subject.locked": "Stop the timer to change the subject",
+        "fullscreen.exit": "Exit fullscreen",
+        "dash.subjects": "📚 Time by subject",
+        "dash.subjectsEmpty": "No subjects recorded yet. Pick a subject on the home page before starting the timer and it will show up here.",
+        "dash.untagged": "No subject",
+        "sec.subjects": "Subjects",
+        "set.subjectsHint": "Add your subjects and pick one before starting the timer, then see the time for each subject on the Dashboard. Deleting a subject doesn't erase its past time.",
+        "set.subjectName": "Subject name",
+        "set.addSubject": "Add",
+        "set.removeSubject": "Delete subject",
+        "set.subjectsEmpty": "No subjects yet.",
+        "privacy.3": "You can use the main timer without creating an account. If you choose to create an account, we collect the email address you register with, and your password is handled by Firebase Authentication (a Google service). If you sign in, your study statistics and some preferences (language, theme, Pomodoro durations, sound settings, and the subject names you create) are stored in your account using Google Cloud Firestore so they can sync across your devices, and you can delete your account and all synced data at any time from the Settings page. If you send a message through the Contact page, your name, email address, and message are sent to us through Formspree."
+});
+
+
+    /* ألوان المواد */
+    Object.assign(DICT.ar, {
+        "set.changeColor": "تغيير اللون"
+});
+
+    Object.assign(DICT.en, {
+        "set.changeColor": "Change color"
+});
+
+
+    /* الإنجازات وخريطة السنة */
+    Object.assign(DICT.ar, {
+        "dash.heatmap": "📅 خريطة السنة",
+        "dash.heatSummary": "ذاكرت في {n} يوم خلال آخر 12 شهر.",
+        "dash.heatLess": "أقل",
+        "dash.heatMore": "أكثر",
+        "dash.ach": "🏆 الإنجازات",
+        "dash.achCount": "فتحت {a} من {b} إنجاز",
+        "ach.new": "🏆 إنجاز جديد: {title}",
+        "ach.newMore": "🏆 إنجاز جديد: {title} (و{n} أخرى)",
+        "ach.first.t": "البداية",
+        "ach.first.d": "سجّلت أول جلسة مذاكرة.",
+        "ach.streak.t": "{n} أيام متتالية",
+        "ach.streak.d": "ذاكرت {n} أيام متتالية.",
+        "ach.streakLong.t": "{n} يومًا متتاليًا",
+        "ach.streakLong.d": "ذاكرت {n} يومًا متتاليًا.",
+        "ach.hours.t": "{n} ساعة مذاكرة",
+        "ach.hours.d": "وصل مجموع وقت مذاكرتك إلى {n} ساعة.",
+        "ach.pomo.t": "{n} بومودورو",
+        "ach.pomo.d": "أكملت {n} جلسة بومودورو.",
+        "ach.marathon.t": "الماراثون",
+        "ach.marathon.d": "جلسة واحدة لمدة ساعتين أو أكثر.",
+        "ach.goal1.t": "هدف اليوم",
+        "ach.goal1.d": "حققت هدفك اليومي مرة واحدة.",
+        "ach.goal7.t": "المنتظم",
+        "ach.goal7.d": "حققت هدفك اليومي {n} مرات."
+});
+
+    Object.assign(DICT.en, {
+        "dash.heatmap": "📅 Year heatmap",
+        "dash.heatSummary": "You studied on {n} days in the last 12 months.",
+        "dash.heatLess": "Less",
+        "dash.heatMore": "More",
+        "dash.ach": "🏆 Achievements",
+        "dash.achCount": "{a} of {b} unlocked",
+        "ach.new": "🏆 New achievement: {title}",
+        "ach.newMore": "🏆 New achievement: {title} (+{n} more)",
+        "ach.first.t": "First step",
+        "ach.first.d": "You logged your first study session.",
+        "ach.streak.t": "{n}-day streak",
+        "ach.streak.d": "You studied {n} days in a row.",
+        "ach.streakLong.t": "{n}-day streak",
+        "ach.streakLong.d": "You studied {n} days in a row.",
+        "ach.hours.t": "{n} study hours",
+        "ach.hours.d": "Your total study time reached {n} hours.",
+        "ach.pomo.t": "{n} Pomodoros",
+        "ach.pomo.d": "You completed {n} Pomodoro sessions.",
+        "ach.marathon.t": "Marathon",
+        "ach.marathon.d": "A single session of 2 hours or more.",
+        "ach.goal1.t": "Daily goal",
+        "ach.goal1.d": "You reached your daily goal once.",
+        "ach.goal7.t": "Consistent",
+        "ach.goal7.d": "You reached your daily goal {n} times."
+});
+
+
+    /* جملة وصف الموقع أسفل الصفحة الرئيسية */
+    Object.assign(DICT.ar, {
+        "home.foot": "مؤقت مذاكرة مجاني بنظام بومودورو وساعة إيقاف، مع إحصائيات وهدف يومي.",
+        "home.footLink": "تعرّف على Tickwell"
+});
+
+    Object.assign(DICT.en, {
+        "home.foot": "is a free study timer with Pomodoro, stopwatch, statistics and daily goals.",
+        "home.footLink": "Learn more about Tickwell"
+});
+
+
     /* ========================= */
     /* التحميل والحفظ */
     /* ========================= */
@@ -536,6 +780,7 @@
         s.pomo.long = clamp(s.pomo.long, 1, 120, d.pomo.long);
         s.pomo.sessions = clamp(s.pomo.sessions, 1, 10, d.pomo.sessions);
         s.pomo.auto = !!s.pomo.auto;
+        s.pomo.alarm = !!s.pomo.alarm;
 
         s.sound = !!s.sound;
         s.notifications = !!s.notifications;
@@ -547,6 +792,41 @@
         s.volume = isFinite(v) ? Math.min(1, Math.max(0, v)) : d.volume;
 
         s.updatedAt = Number(s.updatedAt) || 0;
+
+        s.subjects = Array.isArray(s.subjects)
+            ? Array.from(new Set(
+                s.subjects.map((x) => String(x).trim().slice(0, 30)).filter(Boolean)
+            )).slice(0, 20)
+            : [];
+
+        s.subject = s.subjects.includes(s.subject) ? s.subject : "";
+
+        /* ألوان المواد: لون من القايمة، وأي مادة من غير لون ياخد أقل لون مستخدم */
+        const rawColors =
+            s.subjectColors && typeof s.subjectColors === "object" && !Array.isArray(s.subjectColors)
+                ? s.subjectColors
+                : {};
+
+        const colors = {};
+
+        Object.keys(rawColors).slice(0, 60).forEach((name) => {
+            if (SUBJECT_PALETTE.includes(rawColors[name])) colors[name] = rawColors[name];
+        });
+
+        s.subjects.forEach((name) => {
+            if (colors[name]) return;
+
+            const used = {};
+
+            s.subjects.forEach((other) => {
+                if (colors[other]) used[colors[other]] = (used[colors[other]] || 0) + 1;
+            });
+
+            colors[name] = SUBJECT_PALETTE.slice()
+                .sort((a, b) => (used[a] || 0) - (used[b] || 0))[0];
+        });
+
+        s.subjectColors = colors;
 
         return s;
     }
@@ -672,10 +952,40 @@
     }
 
 
+    /* زر تسجيل الدخول (فوق جنب القايمة): بيظهر لو المستخدم مش مسجّل دخول */
+    function ensureLoginButton() {
+        if (document.documentElement.hasAttribute("data-no-login-btn")) return;
+        if (!document.querySelector(".menu-container")) return;
+
+        let button = document.getElementById("loginButton");
+
+        if (!button) {
+            button = document.createElement("a");
+
+            button.id = "loginButton";
+            button.className = "login-button";
+            button.href = "login.html";
+            button.setAttribute("data-i18n", "menu.login");
+
+            document.body.appendChild(button);
+        }
+
+        let hint = null;
+
+        try {
+            hint = localStorage.getItem("tickwellAuthHint");
+        } catch (e) {}
+
+        button.hidden = hint === "in";
+    }
+
+
     function applyPage() {
         applyHtmlAttrs();
 
         if (!document.body) return;
+
+        ensureLoginButton();
 
         document.body.classList.toggle("light-mode", resolvedTheme() === "light");
 
@@ -690,6 +1000,11 @@
         if (titleKey) document.title = t(titleKey);
 
         document.querySelectorAll(".menu-container").forEach((el) => {
+            el.dir = settings.lang === "ar" ? "rtl" : "ltr";
+        });
+
+        /* عناصر اتجاهها بيتبع اللغة (مثلاً نص في صفحة اتجاهها ثابت) */
+        document.querySelectorAll("[data-lang-dir]").forEach((el) => {
             el.dir = settings.lang === "ar" ? "rtl" : "ltr";
         });
 
@@ -747,7 +1062,7 @@
     function applyRemote(remote) {
         if (!remote || typeof remote !== "object") return;
 
-        ["lang", "theme", "sound", "volume"].forEach((k) => {
+        ["lang", "theme", "sound", "volume", "subjects", "subjectColors"].forEach((k) => {
             if (remote[k] !== undefined) settings[k] = remote[k];
         });
 
@@ -827,6 +1142,128 @@
     }
 
 
+    /* صوت "تنج" لنهاية جلسة التركيز */
+    function chime(force) {
+        if (!settings.sound && !force) return;
+
+        try {
+            initAudio();
+
+            if (!audioCtx) return;
+
+            const peak = Math.max(0.0002, settings.volume * 0.5);
+            const t0 = audioCtx.currentTime;
+            const base = 1318.5;
+
+            /* جرس: نغمات غير متناسقة بتخفت بسرعات مختلفة */
+            [
+                [1.0, 1.0, 2.4],
+                [2.76, 0.45, 1.5],
+                [5.4, 0.22, 0.9],
+                [8.93, 0.1, 0.5]
+            ].forEach(([ratio, amp, decay]) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = "sine";
+                osc.frequency.value = base * ratio;
+
+                gain.gain.setValueAtTime(0.0001, t0);
+                gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak * amp), t0 + 0.006);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t0 + decay);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(t0);
+                osc.stop(t0 + decay + 0.05);
+            });
+        } catch (e) {}
+    }
+
+
+    /* منبه نهاية الراحة: يتكرر لحد ما نوقفه */
+    let alarmSource = null;
+    let alarmGain = null;
+
+    function buildAlarmBuffer() {
+        const rate = audioCtx.sampleRate;
+        const length = Math.floor(rate * 1.6);
+        const buffer = audioCtx.createBuffer(1, length, rate);
+        const data = buffer.getChannelData(0);
+
+        const beepLength = Math.floor(rate * 0.12);
+
+        [0, 0.2, 0.4, 0.6].forEach((start) => {
+            const offset = Math.floor(start * rate);
+
+            for (let i = 0; i < beepLength && offset + i < length; i++) {
+                const t = i / rate;
+                const w = 2 * Math.PI * 1040 * t;
+
+                const env =
+                    Math.min(1, i / (0.008 * rate)) *
+                    Math.min(1, (beepLength - i) / (0.02 * rate));
+
+                data[offset + i] =
+                    (Math.sin(w) + Math.sin(3 * w) / 3 + Math.sin(5 * w) / 5) * 0.6 * env;
+            }
+        });
+
+        return buffer;
+    }
+
+    function startAlarm(force) {
+        if (!settings.sound && !force) return false;
+
+        initAudio();
+
+        if (!audioCtx) return false;
+        if (alarmSource) return true;
+
+        try {
+            alarmGain = audioCtx.createGain();
+            alarmGain.gain.value = Math.max(0.0002, settings.volume * 0.6);
+
+            alarmSource = audioCtx.createBufferSource();
+            alarmSource.buffer = buildAlarmBuffer();
+            alarmSource.loop = true;
+
+            alarmSource.connect(alarmGain);
+            alarmGain.connect(audioCtx.destination);
+
+            alarmSource.start();
+
+            return true;
+        } catch (e) {
+            alarmSource = null;
+
+            return false;
+        }
+    }
+
+    function stopAlarm() {
+        try {
+            if (alarmSource) {
+                alarmSource.stop();
+                alarmSource.disconnect();
+            }
+
+            if (alarmGain) alarmGain.disconnect();
+        } catch (e) {}
+
+        alarmSource = null;
+        alarmGain = null;
+    }
+
+    /* المتصفحات بتوقف الصوت لحد أول لمسة، فنشغّله أول ما المستخدم يتفاعل */
+    ["pointerdown", "keydown", "touchstart"].forEach((name) => {
+        window.addEventListener(name, () => {
+            if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        }, { passive: true });
+    });
+
+
     /* ========================= */
     /* التشغيل */
     /* ========================= */
@@ -843,6 +1280,12 @@
         resolvedTheme,
         initAudio,
         beep,
+        chime,
+        subjectColor: (name) => (settings.subjectColors && settings.subjectColors[name]) || "#8a8a8a",
+        palette: () => SUBJECT_PALETTE.slice(),
+        startAlarm,
+        stopAlarm,
+        isAlarming: () => !!alarmSource,
         defaults: () => clone(DEFAULTS)
     };
 

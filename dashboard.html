@@ -2,18 +2,12 @@
 <html lang="ar" dir="rtl" data-i18n-page data-rtl data-title-key="title.dashboard">
 <head>
     <link rel="canonical" href="https://tickwell1.github.io/dashboard.html">
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5FERLLMF79"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-5FERLLMF79');
-    </script>
+    <script src="./consent.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="لوحة تحكم Tickwell: إحصائيات المذاكرة والهدف اليومي.">
     <meta name="author" content="Hesham Khaled">
+    <meta name="robots" content="noindex">
     <title>Dashboard - Tickwell</title>
     <link rel="icon" type="image/png" href="./brain.png">
     <link rel="manifest" href="./manifest.webmanifest">
@@ -131,7 +125,7 @@
         /* ---- Stats grid ---- */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 12px;
         }
 
@@ -227,6 +221,54 @@
         .chart-note { margin: 12px 0 0; font-size: 12px; opacity: 0.6; }
 
         /* ---- Footer ---- */
+        /* ---- Subjects ---- */
+        .subj-row { margin-bottom: 14px; }
+        .subj-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; font-size: 14px; }
+        .subj-name { display: flex; align-items: center; gap: 8px; font-weight: bold; word-break: break-word; }
+        .subj-dot { flex-shrink: 0; width: 10px; height: 10px; border-radius: 50%; }
+        .subj-bar { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+        .subj-fill { height: 100%; border-radius: 999px; background: currentColor; opacity: 0.85; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .subj-fill.muted { opacity: 0.35; }
+
+        /* ---- Heatmap ---- */
+        .heat-scroll { overflow-x: auto; direction: ltr; padding-bottom: 8px; }
+        .heat-inner { display: inline-block; min-width: max-content; }
+        .heat-months { display: grid; grid-auto-flow: column; grid-auto-columns: 12px; gap: 3px; height: 15px; margin-bottom: 4px; font-size: 11px; opacity: 0.65; }
+        .heat-months span { white-space: nowrap; overflow: visible; }
+        .heat-grid { display: grid; grid-template-rows: repeat(7, 12px); grid-auto-flow: column; grid-auto-columns: 12px; gap: 3px; }
+        .heat-cell { width: 12px; height: 12px; border-radius: 3px; background: rgba(255, 255, 255, 0.07); }
+        .heat-cell.l1 { background: rgba(74, 222, 128, 0.28); }
+        .heat-cell.l2 { background: rgba(74, 222, 128, 0.5); }
+        .heat-cell.l3 { background: rgba(74, 222, 128, 0.75); }
+        .heat-cell.l4 { background: #4ade80; }
+        .heat-legend { display: flex; align-items: center; justify-content: flex-end; gap: 5px; margin-top: 8px; font-size: 12px; opacity: 0.75; }
+        .heat-legend .heat-cell { flex-shrink: 0; }
+        .heat-summary { margin: 0 0 10px; font-size: 13px; opacity: 0.75; }
+
+        /* ---- Achievements ---- */
+        .ach-count { margin: -6px 0 14px; font-size: 13px; opacity: 0.75; }
+        .ach-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+
+        .ach-card {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            opacity: 0.55;
+            filter: grayscale(0.7);
+        }
+
+        .ach-card.on { opacity: 1; filter: none; border-color: #e6aa1e; background: rgba(230, 170, 30, 0.1); }
+        .ach-icon { font-size: 26px; line-height: 1.2; }
+        .ach-title { font-size: 14px; font-weight: bold; }
+        .ach-desc { font-size: 12px; line-height: 1.5; opacity: 0.8; }
+        .ach-bar { height: 6px; margin-top: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+        .ach-fill { height: 100%; border-radius: 999px; background: currentColor; }
+        .ach-prog { font-size: 12px; opacity: 0.85; }
+
         .dash-foot { text-align: center; margin-top: 26px; font-size: 13px; opacity: 0.75; line-height: 1.8; }
 
         .danger-button {
@@ -253,6 +295,15 @@
         body.light-mode .range-toggle button.active { background: black; color: white; border-color: black; }
         body.light-mode .goal-custom input { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.2); }
         body.light-mode .goal-custom input:focus { border-color: black; }
+        body.light-mode .subj-bar { background: rgba(0, 0, 0, 0.1); }
+        body.light-mode .heat-cell { background: rgba(0, 0, 0, 0.07); }
+        body.light-mode .heat-cell.l1 { background: rgba(22, 163, 74, 0.28); }
+        body.light-mode .heat-cell.l2 { background: rgba(22, 163, 74, 0.5); }
+        body.light-mode .heat-cell.l3 { background: rgba(22, 163, 74, 0.75); }
+        body.light-mode .heat-cell.l4 { background: #16a34a; }
+        body.light-mode .ach-card { border-color: rgba(0, 0, 0, 0.1); background: rgba(0, 0, 0, 0.04); }
+        body.light-mode .ach-card.on { border-color: #b7791f; background: rgba(230, 170, 30, 0.14); }
+        body.light-mode .ach-bar { background: rgba(0, 0, 0, 0.1); }
         body.light-mode .chart-plot { border-bottom-color: rgba(0, 0, 0, 0.25); }
         body.light-mode .ring.done .ring-fill,
         body.light-mode .bar.hit { stroke: #16a34a; }
@@ -363,6 +414,46 @@
             <p class="chart-note" data-i18n="dash.chartNote">الخط المتقطع هو هدفك اليومي، والأعمدة الخضراء هي الأيام اللي حققت فيها الهدف.</p>
         </section>
 
+        <!-- Time by subject -->
+        <section class="card">
+            <h2 data-i18n="dash.subjects">📚 الوقت حسب المادة</h2>
+
+            <div id="subjectsBox"></div>
+        </section>
+
+        <!-- Year heatmap -->
+        <section class="card">
+            <h2 data-i18n="dash.heatmap">📅 خريطة السنة</h2>
+
+            <p class="heat-summary" id="heatSummary"></p>
+
+            <div class="heat-scroll" id="heatScroll">
+                <div class="heat-inner">
+                    <div class="heat-months" id="heatMonths"></div>
+                    <div class="heat-grid" id="heatGrid"></div>
+                </div>
+            </div>
+
+            <div class="heat-legend">
+                <span data-i18n="dash.heatLess">أقل</span>
+                <span class="heat-cell"></span>
+                <span class="heat-cell l1"></span>
+                <span class="heat-cell l2"></span>
+                <span class="heat-cell l3"></span>
+                <span class="heat-cell l4"></span>
+                <span data-i18n="dash.heatMore">أكثر</span>
+            </div>
+        </section>
+
+        <!-- Achievements -->
+        <section class="card">
+            <h2 data-i18n="dash.ach">🏆 الإنجازات</h2>
+
+            <div class="ach-count" id="achCount"></div>
+
+            <div class="ach-grid" id="achGrid"></div>
+        </section>
+
         <div class="dash-foot">
             <span id="dashNote" data-i18n="dash.local">الإحصائيات محفوظة على هذا الجهاز وهذا المتصفح فقط.</span><br>
             <button type="button" class="danger-button" id="clearButton" data-i18n="dash.clear">مسح كل الإحصائيات</button>
@@ -403,6 +494,7 @@
     </script>
 
     <script src="./stats.js"></script>
+    <script src="./achievements.js"></script>
 
     <script>
         (function () {
@@ -622,6 +714,159 @@
             }
 
 
+            function esc(text) {
+                return String(text).replace(/[&<>"']/g, (c) => ({
+                    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+                }[c]));
+            }
+
+
+            function renderSubjects(data, today) {
+                const keys = [];
+
+                for (let i = range - 1; i >= 0; i--) keys.push(ST.addDays(today, -i));
+
+                const totals = {};
+                let tagged = 0;
+
+                keys.forEach((k) => {
+                    const day = (data.subjectDays || {})[k] || {};
+
+                    Object.keys(day).forEach((name) => {
+                        totals[name] = (totals[name] || 0) + day[name];
+                        tagged += day[name];
+                    });
+                });
+
+                const all = keys.reduce((sum, k) => sum + (data.days[k] || 0), 0);
+
+                const rows = Object.keys(totals)
+                    .map((name) => ({ name, sec: totals[name] }))
+                    .sort((a, b) => b.sec - a.sec);
+
+                const box = $("subjectsBox");
+
+                if (!rows.length) {
+                    box.innerHTML = `<div class="empty-note" style="display:block">${T("dash.subjectsEmpty")}</div>`;
+                    return;
+                }
+
+                rows.forEach((r) => { r.color = S.subjectColor(r.name); });
+
+                const untagged = Math.max(0, all - tagged);
+
+                if (untagged > 0) {
+                    rows.push({ name: T("dash.untagged"), sec: untagged, muted: true, color: "#8a8a8a" });
+                }
+
+                const max = Math.max(...rows.map((r) => r.sec)) || 1;
+
+                box.innerHTML = rows.map((r) => `
+                    <div class="subj-row">
+                        <div class="subj-top">
+                            <span class="subj-name"><span class="subj-dot" style="background:${r.color}"></span>${esc(r.name)}</span>
+                            <span>${fmt(r.sec)} · ${Math.round((r.sec / (all || 1)) * 100)}%</span>
+                        </div>
+                        <div class="subj-bar">
+                            <div class="subj-fill${r.muted ? " muted" : ""}" style="width:${Math.max(2, (r.sec / max) * 100)}%;background:${r.color}"></div>
+                        </div>
+                    </div>`).join("");
+            }
+
+
+            function renderHeatmap(data, today) {
+                const WEEKS = 53;
+                const weekStart = S.get().lang === "ar" ? 6 : 0;   // السبت للعربي والأحد للإنجليزي
+
+                const [y, m, day] = today.split("-").map(Number);
+                const weekday = new Date(y, m - 1, day).getDay();
+                const rowsInLastColumn = ((weekday - weekStart + 7) % 7) + 1;
+                const totalCells = (WEEKS - 1) * 7 + rowsInLastColumn;
+
+                const first = ST.addDays(today, -(totalCells - 1));
+                const goalSeconds = data.goal * 60;
+
+                const grid = $("heatGrid");
+                const months = $("heatMonths");
+
+                grid.innerHTML = "";
+                months.innerHTML = "";
+
+                let studiedDays = 0;
+
+                for (let i = 0; i < totalCells; i++) {
+                    const key = ST.addDays(first, i);
+                    const seconds = data.days[key] || 0;
+                    const cell = document.createElement("span");
+
+                    let level = 0;
+
+                    if (seconds >= 60) {
+                        studiedDays++;
+
+                        level = seconds >= goalSeconds ? 4
+                            : seconds >= goalSeconds * 0.5 ? 3
+                            : seconds >= goalSeconds * 0.25 ? 2
+                            : 1;
+                    }
+
+                    cell.className = "heat-cell" + (level ? " l" + level : "");
+                    cell.title = keyToDate(key).toLocaleDateString(locale(), { day: "numeric", month: "long" }) + " - " + fmt(seconds);
+
+                    grid.appendChild(cell);
+                }
+
+                /* أسماء الشهور: فوق أول أسبوع من كل شهر */
+                for (let w = 0; w < WEEKS; w++) {
+                    const label = document.createElement("span");
+                    const date = keyToDate(ST.addDays(first, w * 7));
+
+                    if (date.getDate() <= 7) {
+                        label.textContent = date.toLocaleDateString(locale(), { month: "short" });
+                    }
+
+                    months.appendChild(label);
+                }
+
+                $("heatSummary").textContent = T("dash.heatSummary", { n: studiedDays });
+
+                $("heatScroll").scrollLeft = $("heatScroll").scrollWidth;
+            }
+
+
+            function renderAchievements(data) {
+                if (!window.TickwellAchievements) return;
+
+                const items = window.TickwellAchievements.list(data);
+                const unlocked = items.filter((x) => x.unlocked).length;
+
+                $("achCount").textContent = T("dash.achCount", { a: unlocked, b: items.length });
+
+                $("achGrid").innerHTML = items.map((item) => {
+                    const percent = Math.min(100, Math.round((item.current / item.target) * 100));
+
+                    const current = item.unit === "h"
+                        ? (Math.floor(item.current * 10) / 10)
+                        : Math.floor(item.current);
+
+                    const unit = item.unit === "h" ? T("unit.h") : item.unit === "m" ? T("unit.m") : "";
+
+                    const progress = item.unlocked
+                        ? ""
+                        : `<div class="ach-bar"><div class="ach-fill" style="width:${percent}%"></div></div>
+                           <div class="ach-prog">${Math.min(current, item.target)}/${item.target}${unit}</div>`;
+
+                    return `
+                        <div class="ach-card${item.unlocked ? " on" : ""}">
+                            <div class="ach-icon">${item.icon}</div>
+                            <div class="ach-title">${esc(T(item.t, { n: item.n }))}</div>
+                            <div class="ach-desc">${esc(T(item.d, { n: item.n }))}</div>
+                            ${progress}
+                        </div>`;
+                }).join("");
+            }
+
+
             function render() {
                 const data = ST.load();
                 const today = ST.dayKey(Date.now());
@@ -629,6 +874,9 @@
                 renderGoal(data, data.days[today] || 0);
                 renderStats(data, today);
                 renderChart(data, today);
+                renderSubjects(data, today);
+                renderHeatmap(data, today);
+                renderAchievements(data);
             }
 
 

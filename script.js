@@ -29,6 +29,30 @@ const pomoLabel =
 const pomoDotsBox =
     document.getElementById("pomoDots");
 
+const subjectButton =
+    document.getElementById("subjectButton");
+
+const subjectMenu =
+    document.getElementById("subjectMenu");
+
+const subjectDot =
+    document.getElementById("subjectDot");
+
+const subjectName =
+    document.getElementById("subjectName");
+
+const fsSubject =
+    document.getElementById("fsSubject");
+
+const fsDot =
+    document.getElementById("fsDot");
+
+const fsName =
+    document.getElementById("fsName");
+
+const exitFullscreenButton =
+    document.getElementById("exitFullscreen");
+
 const baseTitle = document.title;
 
 
@@ -95,7 +119,8 @@ function freshPomo() {
         running: false,
         cycle: 0,                     // جلسات التركيز المكتملة في الدورة الحالية
         segStart: 0,                  // بداية فترة التركيز الحالية (للإحصائيات)
-        fullMs: PHASES.focus.ms       // المدة الكاملة للمرحلة (لمعرفة لو لسه ماتحركتش)
+        fullMs: PHASES.focus.ms,      // المدة الكاملة للمرحلة (لمعرفة لو لسه ماتحركتش)
+        alarming: false               // المنبه شغال وبننتظر "أنا هنا"
     };
 }
 
@@ -180,9 +205,74 @@ document.addEventListener("visibilitychange", () => {
 });
 
 
+const buttonsSpacer =
+    document.getElementById("buttonsSpacer");
+
+
+/* وقت التشغيل الأزرار بتتثبت في آخر الشاشة (position: fixed)
+   ونسيب مكانها فاضي عشان باقي الصفحة ما يتحركش */
+function updateRunShift() {
+    if (buttons.offsetHeight === 0) return;
+
+    buttonsSpacer.style.height = buttons.classList.contains("running")
+        ? buttons.offsetHeight + 15 + "px"
+        : "0px";
+}
+
+let shiftFrame = null;
+
+function scheduleRunShift() {
+    cancelAnimationFrame(shiftFrame);
+    shiftFrame = requestAnimationFrame(updateRunShift);
+}
+
+window.addEventListener("resize", scheduleRunShift);
+window.addEventListener("orientationchange", scheduleRunShift);
+
+
+/* حركة ناعمة من مكان الأزرار القديم للجديد */
+function animateButtons(first) {
+    if (!buttons.animate || document.body.classList.contains("fullscreen-mode")) return;
+
+    try {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    } catch (e) {}
+
+    const last = buttons.getBoundingClientRect();
+
+    if (!first.height || !last.height) return;
+
+    const dx = first.left - last.left;
+    const dy = first.top - last.top;
+
+    if (!dx && !dy) return;
+
+    buttons.animate(
+        [
+            { transform: `translate(${dx}px, ${dy}px)` },
+            { transform: "translate(0, 0)" }
+        ],
+        { duration: 700, easing: "ease-in-out" }
+    );
+}
+
+
 function setRunningUI(on) {
+    const first = buttons.getBoundingClientRect();
+    const changed = buttons.classList.contains("running") !== on;
+
     startButton.textContent = on ? T("stop") : T("start");
     buttons.classList.toggle("running", on);
+
+    updateRunShift();
+
+    if (changed) animateButtons(first);
+
+    /* المادة بتتقفل أثناء التشغيل عشان الجلسة تتسجل على مادة واحدة */
+    subjectButton.disabled = on;
+    subjectButton.title = on ? T("subject.locked") : "";
+
+    if (on) closeSubjectMenu();
 
     if (on) {
         requestWakeLock();
@@ -202,6 +292,10 @@ function initAudio() {
 
 function playBeep() {
     SETTINGS.beep();
+}
+
+function playChime() {
+    SETTINGS.chime();
 }
 
 function askNotificationPermission() {
@@ -241,16 +335,39 @@ function showToast(text) {
 }
 
 
+/* إنجاز جديد؟ (بيظهر كإشعار صغير) */
+function checkAchievements(delay) {
+    try {
+        if (!window.TickwellAchievements) return;
+
+        const fresh = TickwellAchievements.checkNew();
+
+        if (!fresh.length) return;
+
+        const first = fresh[0];
+        const title = T(first.t, { n: first.n });
+
+        const message = fresh.length > 1
+            ? T("ach.newMore", { title, n: fresh.length - 1 })
+            : T("ach.new", { title });
+
+        setTimeout(() => showToast(message), delay || 0);
+    } catch (e) {}
+}
+
+
 function logSegment(startMs, endMs, kind) {
     try {
         if (!window.TickwellStats || !startMs) return;
 
-        const result = TickwellStats.logSession(startMs, endMs, kind);
+        const result = TickwellStats.logSession(startMs, endMs, kind, cfg().subject);
 
         if (result && result.goalReached) {
             showToast(T("goal.reached"));
             notify(T("goal.reached"));
         }
+
+        checkAchievements(result && result.goalReached ? 3500 : 0);
     } catch (e) {}
 }
 
@@ -269,6 +386,8 @@ function countPomodoro(ms) {
     try {
         if (window.TickwellStats) TickwellStats.addPomodoro(ms);
     } catch (e) {}
+
+    checkAchievements(0);
 }
 
 
@@ -403,13 +522,40 @@ function completePhase() {
     }
 
     advancePhase();
-    playBeep();
 
     notify(
         finished === "focus"
             ? T("note.focusDone")
             : T("note.breakDone")
     );
+
+    /* خلصت الراحة: منبه مستمر لحد ما المستخدم يضغط "أنا هنا" */
+    const holdForAlarm =
+        finished !== "focus" &&
+        cfg().sound &&
+        cfg().pomo.alarm;
+
+    if (finished === "focus") {
+        playChime();
+    } else if (!holdForAlarm) {
+        playBeep();
+    }
+
+    if (holdForAlarm) {
+        clearInterval(interval);
+        interval = null;
+
+        pomo.running = false;
+        pomo.segStart = 0;
+
+        setRunningUI(false);
+        savePomo();
+        renderPomo();
+
+        showAlarm();
+
+        return;
+    }
 
     if (POMODORO.autoStartNext) {
         pomo.segStart = Date.now();
@@ -424,6 +570,53 @@ function completePhase() {
     savePomo();
     renderPomo();
 }
+
+
+/* ========================= */
+/* منبه نهاية الراحة */
+/* ========================= */
+
+const alarmOverlay = document.getElementById("alarmOverlay");
+const alarmDismiss = document.getElementById("alarmDismiss");
+
+
+function isAlarmOpen() {
+    return alarmOverlay.classList.contains("open");
+}
+
+
+function showAlarm() {
+    pomo.alarming = true;
+    savePomo();
+
+    alarmOverlay.classList.add("open");
+
+    SETTINGS.startAlarm();
+
+    /* نخلي الشاشة صاحية عشان المنبه يفضل شغال */
+    requestWakeLock();
+
+    alarmDismiss.focus();
+}
+
+
+function dismissAlarm() {
+    SETTINGS.stopAlarm();
+
+    alarmOverlay.classList.remove("open");
+
+    pomo.alarming = false;
+    savePomo();
+
+    if (POMODORO.autoStartNext && !pomo.running) {
+        startPomo();
+    } else {
+        releaseWakeLock();
+    }
+}
+
+
+alarmDismiss.addEventListener("click", dismissAlarm);
 
 
 function pomoTick() {
@@ -525,6 +718,7 @@ function applyMode(next) {
 
     modeSwitch.classList.toggle("pomodoro", isPomodoro);
     pomoInfo.classList.toggle("visible", isPomodoro);
+    document.body.classList.toggle("pomodoro-mode", isPomodoro);
 
     modeButtons.forEach((btn) => {
         const active = btn.dataset.mode === mode;
@@ -534,6 +728,7 @@ function applyMode(next) {
     });
 
     render();
+    updateRunShift();
 }
 
 
@@ -695,37 +890,58 @@ themeButton.addEventListener("click", () => {
 /* Fullscreen */
 /* ========================= */
 
-fullscreenButton.addEventListener(
-    "click",
-    async () => {
+/* ملء الشاشة البديل: للأجهزة اللي مش بتدعم Fullscreen API (زي iPhone) */
+function enterSoftFullscreen() {
+    document.body.classList.add("soft-fullscreen", "fullscreen-mode");
+}
 
-        try {
+function exitSoftFullscreen() {
+    document.body.classList.remove("soft-fullscreen", "fullscreen-mode");
 
-            if (!document.fullscreenElement) {
+    scheduleRunShift();
+}
 
-                await document.documentElement.requestFullscreen();
+exitFullscreenButton.addEventListener("click", exitSoftFullscreen);
 
-                document.body.classList.add(
-                    "fullscreen-mode"
-                );
 
-            } else {
+fullscreenButton.addEventListener("click", async () => {
 
-                await document.exitFullscreen();
+    if (document.body.classList.contains("soft-fullscreen")) {
+        exitSoftFullscreen();
+        return;
+    }
 
-            }
+    const root = document.documentElement;
+    const request = root.requestFullscreen || root.webkitRequestFullscreen;
 
-        } catch (error) {
+    if (!request) {
+        enterSoftFullscreen();
+        return;
+    }
 
-            console.log(
-                "Fullscreen error:",
-                error
-            );
+    try {
+
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+
+            await request.call(root);
+
+            document.body.classList.add("fullscreen-mode");
+
+        } else {
+
+            await (document.exitFullscreen || document.webkitExitFullscreen).call(document);
 
         }
 
+    } catch (error) {
+
+        console.log("Fullscreen error:", error);
+
+        if (!document.fullscreenElement) enterSoftFullscreen();
+
     }
-);
+
+});
 
 
 /* ========================= */
@@ -749,6 +965,9 @@ document.addEventListener(
             );
 
         }
+
+        /* بعد الخروج من ملء الشاشة نرجّع الأزرار لمكانها الصح */
+        scheduleRunShift();
 
     }
 );
@@ -893,9 +1112,20 @@ document.addEventListener("click", (event) => {
 /* نستخدم event.code عشان الاختصارات تشتغل حتى مع الكيبورد العربي */
 document.addEventListener("keydown", (event) => {
 
+    if (
+        event.code === "Escape" &&
+        document.body.classList.contains("soft-fullscreen")
+    ) {
+        exitSoftFullscreen();
+        return;
+    }
+
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 
     if (!cfg().shortcuts) return;
+
+    /* أثناء المنبه الأزرار بس هي اللي تشتغل */
+    if (isAlarmOpen() || !subjectMenu.hidden) return;
 
     const target = event.target;
 
@@ -990,8 +1220,185 @@ function refreshTexts() {
 }
 
 
+/* ========================= */
+/* المواد (زر + قايمة) */
+/* ========================= */
+
+function subjectColor(name) {
+    return name ? SETTINGS.subjectColor(name) : "#8a8a8a";
+}
+
+
+/* الزر نفسه واسم المادة تحت العداد في ملء الشاشة */
+function buildSubjects() {
+    const current = cfg().subject;
+
+    subjectDot.style.background = subjectColor(current);
+    subjectName.textContent = current || T("subject.none");
+
+    fsDot.style.background = subjectColor(current);
+    fsName.textContent = current;
+    fsSubject.classList.toggle("has", !!current);
+
+    if (!subjectMenu.hidden) renderSubjectMenu();
+}
+
+
+function renderSubjectMenu() {
+    const current = cfg().subject;
+
+    subjectMenu.innerHTML = "";
+
+    const addItem = (value, label, color) => {
+        const item = document.createElement("button");
+        const dot = document.createElement("span");
+        const text = document.createElement("span");
+
+        item.type = "button";
+        item.className = "subject-item" + (value === current ? " selected" : "");
+        item.setAttribute("role", "option");
+        item.setAttribute("aria-selected", String(value === current));
+
+        dot.className = "subject-dot";
+        dot.style.background = color;
+
+        text.className = "subject-item-name";
+        text.textContent = label;
+
+        item.appendChild(dot);
+        item.appendChild(text);
+
+        if (value === current) {
+            const check = document.createElement("span");
+
+            check.className = "subject-check";
+            check.textContent = "✓";
+
+            item.appendChild(check);
+        }
+
+        item.addEventListener("click", () => {
+            SETTINGS.update({ subject: value });
+            closeSubjectMenu();
+        });
+
+        subjectMenu.appendChild(item);
+    };
+
+    addItem("", T("subject.none"), "#8a8a8a");
+
+    cfg().subjects.forEach((name) => addItem(name, name, subjectColor(name)));
+
+    const separator = document.createElement("div");
+
+    separator.className = "subject-sep";
+
+    subjectMenu.appendChild(separator);
+
+    const add = document.createElement("button");
+
+    add.type = "button";
+    add.className = "subject-item subject-add";
+    add.textContent = T("subject.add");
+
+    add.addEventListener("click", () => startNewSubject(add));
+
+    subjectMenu.appendChild(add);
+}
+
+
+/* مادة جديدة: الصف بيتحول لخانة كتابة جوه القايمة */
+function startNewSubject(row) {
+    const input = document.createElement("input");
+
+    input.type = "text";
+    input.className = "subject-input";
+    input.maxLength = 30;
+    input.autocomplete = "off";
+    input.placeholder = T("subject.placeholder");
+
+    row.replaceWith(input);
+    input.focus();
+
+    input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+
+            const name = input.value.trim().slice(0, 30);
+
+            if (name) {
+                const list = cfg().subjects.slice();
+
+                if (!list.includes(name) && list.length < 20) list.push(name);
+
+                SETTINGS.update({ subjects: list, subject: name });
+            }
+
+            closeSubjectMenu();
+        } else if (event.key === "Escape") {
+            event.stopPropagation();
+            renderSubjectMenu();
+        }
+    });
+}
+
+
+function openSubjectMenu() {
+    if (subjectButton.disabled) return;
+
+    renderSubjectMenu();
+
+    subjectMenu.hidden = false;
+    subjectButton.setAttribute("aria-expanded", "true");
+
+    const first = subjectMenu.querySelector(".selected") || subjectMenu.querySelector(".subject-item");
+
+    if (first) first.focus();
+}
+
+
+function closeSubjectMenu() {
+    subjectMenu.hidden = true;
+    subjectButton.setAttribute("aria-expanded", "false");
+}
+
+
+subjectButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    subjectMenu.hidden ? openSubjectMenu() : closeSubjectMenu();
+});
+
+
+document.addEventListener("click", (event) => {
+    /* composedPath عشان الصف ممكن يتشال من الصفحة وقت الضغطة (مادة جديدة) */
+    if (!subjectMenu.hidden && !event.composedPath().includes(subjectMenu)) {
+        closeSubjectMenu();
+    }
+});
+
+
+subjectMenu.addEventListener("keydown", (event) => {
+    const items = Array.from(subjectMenu.querySelectorAll(".subject-item, .subject-input"));
+    const index = items.indexOf(document.activeElement);
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+        items[(index + 1) % items.length].focus();
+    } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        items[(index - 1 + items.length) % items.length].focus();
+    } else if (event.key === "Escape") {
+        event.preventDefault();
+        closeSubjectMenu();
+        subjectButton.focus();
+    }
+});
+
+
 function applySettings() {
     loadPomodoroConfig();
+    buildSubjects();
     buildDots();
     syncPomoDurations();
 
@@ -1007,3 +1414,15 @@ function applySettings() {
 window.addEventListener("tickwell:settings", applySettings);
 
 applySettings();
+
+
+/* لو الصفحة اتفتحت والمنبه كان شغال */
+if (pomo.alarming) {
+    showAlarm();
+}
+
+
+/* أول مرة على الجهاز: نسجل الإنجازات المفتوحة من غير إشعارات */
+try {
+    if (window.TickwellAchievements) TickwellAchievements.baseline();
+} catch (e) {}

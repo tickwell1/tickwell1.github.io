@@ -18,6 +18,7 @@
             v: 1,
             days: {},        // { "2026-10-12": ثواني المذاكرة }
             pomos: {},       // { "2026-10-12": عدد جلسات البومودورو المكتملة }
+            subjectDays: {}, // { "2026-10-12": { "رياضيات": ثواني } } (الجلسات اللي ليها مادة)
             count: 0,        // عدد الجلسات
             longest: 0,      // أطول جلسة بالثواني
             last: null,      // آخر جلسة { end, seconds, mode } للدمج
@@ -77,7 +78,7 @@
 
 
     /* توزيع الوقت على الأيام (لو الجلسة عدّت منتصف الليل) */
-    function addToDays(days, startMs, endMs) {
+    function addToDays(days, startMs, endMs, subjectDays, subject) {
         let cur = startMs;
 
         while (cur < endMs) {
@@ -92,14 +93,24 @@
             const chunkEnd = Math.min(endMs, nextMidnight);
             const key = dayKey(cur);
 
-            days[key] = (days[key] || 0) + Math.round((chunkEnd - cur) / 1000);
+            const chunk = Math.round((chunkEnd - cur) / 1000);
+
+            days[key] = (days[key] || 0) + chunk;
+
+            if (subject && subjectDays) {
+                const day = subjectDays[key] || (subjectDays[key] = {});
+
+                day[subject] = (day[subject] || 0) + chunk;
+            }
 
             cur = chunkEnd;
         }
     }
 
 
-    function logSession(startMs, endMs, mode) {
+    function logSession(startMs, endMs, mode, subject) {
+        subject = subject ? String(subject).slice(0, 30) : "";
+
         const seconds = Math.round((endMs - startMs) / 1000);
 
         if (!(seconds >= MIN_SESSION_SECONDS)) {
@@ -108,13 +119,14 @@
 
         const data = load();
 
-        addToDays(data.days, startMs, endMs);
+        addToDays(data.days, startMs, endMs, data.subjectDays, subject);
 
         const last = data.last;
 
         if (
             last &&
             last.mode === mode &&
+            (last.subject || "") === subject &&
             startMs >= last.end &&
             startMs - last.end < MERGE_GAP_MS
         ) {
@@ -122,7 +134,7 @@
             last.seconds += seconds;
             data.longest = Math.max(data.longest, last.seconds);
         } else {
-            data.last = { end: endMs, seconds, mode };
+            data.last = { end: endMs, seconds, mode, subject };
             data.count += 1;
             data.longest = Math.max(data.longest, seconds);
         }
@@ -198,6 +210,23 @@
     }
 
 
+    function mergeSubjectDays(a, b) {
+        const out = {};
+
+        [a || {}, b || {}].forEach((source) => {
+            Object.keys(source).forEach((day) => {
+                const target = out[day] || (out[day] = {});
+
+                Object.keys(source[day] || {}).forEach((name) => {
+                    target[name] = Math.max(target[name] || 0, source[day][name] || 0);
+                });
+            });
+        });
+
+        return out;
+    }
+
+
     /* دمج نسختين من الإحصائيات (محلية وسحابية) */
     function merge(localData, cloudData, ignoreEpoch) {
         const a = normalize(localData);
@@ -213,6 +242,7 @@
 
             out.days = maxMap(a.days, b.days);
             out.pomos = maxMap(a.pomos, b.pomos);
+            out.subjectDays = mergeSubjectDays(a.subjectDays, b.subjectDays);
             out.count = Math.max(a.count, b.count);
             out.longest = Math.max(a.longest, b.longest);
 

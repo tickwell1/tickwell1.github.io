@@ -2,18 +2,12 @@
 <html lang="ar" dir="rtl" data-i18n-page data-rtl data-title-key="title.settings">
 <head>
     <link rel="canonical" href="https://tickwell1.github.io/settings.html">
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5FERLLMF79"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-5FERLLMF79');
-    </script>
+    <script src="./consent.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Tickwell settings: language, theme, Pomodoro durations, sound and more.">
     <meta name="author" content="Hesham Khaled">
+    <meta name="robots" content="noindex">
     <title>Settings - Tickwell</title>
     <link rel="icon" type="image/png" href="./brain.png">
 
@@ -185,6 +179,90 @@
         .btn:disabled { opacity: 0.5; cursor: wait; }
         a.btn { display: inline-block; text-decoration: none; }
 
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 14px; }
+
+        .chip-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px 6px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            font-size: 14px;
+        }
+
+        [dir="rtl"] .chip-item { padding: 6px 14px 6px 8px; }
+
+        .chip-dot {
+            width: 14px;
+            height: 14px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .chip-item .chip-remove {
+            width: 22px;
+            height: 22px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            color: inherit;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .chip-empty { padding: 4px 0 14px; font-size: 13px; opacity: 0.6; }
+
+        .add-subject { display: flex; gap: 10px; padding: 14px 0 10px; }
+        .add-subject .text-input { flex: 1; }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal.open { display: flex; }
+
+        .modal-panel {
+            width: min(100%, 420px);
+            padding: 22px;
+            border-radius: 16px;
+            background: rgba(28, 28, 28, 0.99);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+        }
+
+        .modal-panel h3 { margin: 0 0 8px; font-size: 18px; }
+        .modal-panel p { margin: 0 0 14px; font-size: 14px; line-height: 1.7; opacity: 0.8; }
+
+        .text-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .text-input:focus { border-color: white; }
+
+        .modal-error { min-height: 20px; margin-top: 8px; font-size: 13px; color: #ff6b6b; }
+        .modal-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+
         .btn.danger { border-color: rgba(255, 90, 90, 0.5); color: #ff6b6b; }
         .btn.danger:hover { background: rgba(255, 90, 90, 0.12); }
 
@@ -200,6 +278,12 @@
         body.light-mode .num:focus { border-color: black; }
         body.light-mode .btn { border-color: rgba(0, 0, 0, 0.3); }
         body.light-mode .btn:hover { background: rgba(0, 0, 0, 0.07); }
+        body.light-mode .chip-item { border-color: rgba(0, 0, 0, 0.25); }
+        body.light-mode .chip-item .chip-remove { background: rgba(0, 0, 0, 0.1); }
+        body.light-mode .modal { background: rgba(255, 255, 255, 0.8); }
+        body.light-mode .modal-panel { background: rgba(250, 250, 250, 0.99); border-color: rgba(0, 0, 0, 0.12); color: #000000; }
+        body.light-mode .text-input { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.2); }
+        body.light-mode .text-input:focus { border-color: black; }
         body.light-mode .btn.danger { border-color: rgba(220, 38, 38, 0.5); color: #dc2626; }
 
         @media (max-width: 600px) {
@@ -302,6 +386,14 @@
                 </div>
                 <label class="switch"><input type="checkbox" id="autoToggle"><span class="knob"></span></label>
             </div>
+
+            <div class="row">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="set.alarm">منبه نهاية الراحة</div>
+                    <div class="row-hint" data-i18n="set.alarmHint"></div>
+                </div>
+                <label class="switch"><input type="checkbox" id="alarmToggle"><span class="knob"></span></label>
+            </div>
         </section>
 
         <!-- Sound & notifications -->
@@ -318,7 +410,8 @@
 
                 <div class="volume-wrap">
                     <input type="range" id="volumeRange" min="0" max="100" step="5">
-                    <button type="button" class="btn" id="testSound" data-i18n="set.test">تجربة الصوت</button>
+                    <button type="button" class="btn" id="testSound" data-i18n="set.test">تجربة صوت التركيز</button>
+                    <button type="button" class="btn" id="testAlarm" data-i18n="set.testAlarm">تجربة المنبه</button>
                 </div>
             </div>
 
@@ -329,6 +422,20 @@
                 </div>
                 <label class="switch"><input type="checkbox" id="notifToggle"><span class="knob"></span></label>
             </div>
+        </section>
+
+        <!-- Subjects -->
+        <section class="card">
+            <h2 data-i18n="sec.subjects">المواد</h2>
+
+            <div class="row-hint" style="margin-top: 8px;" data-i18n="set.subjectsHint"></div>
+
+            <div class="add-subject">
+                <input type="text" class="text-input" id="subjectInput" maxlength="30" autocomplete="off" data-i18n-placeholder="set.subjectName" placeholder="اسم المادة">
+                <button type="button" class="btn" id="addSubject" data-i18n="set.addSubject">إضافة</button>
+            </div>
+
+            <div class="chips" id="subjectList"></div>
         </section>
 
         <!-- Study -->
@@ -370,6 +477,14 @@
                 <a class="btn" id="syncLogin" href="login.html" data-i18n="menu.login">Login</a>
                 <button type="button" class="btn" id="syncNow" data-i18n="sync.now">زامن الآن</button>
             </div>
+
+            <div class="row" id="deleteRow" style="display: none;">
+                <div class="row-text">
+                    <div class="row-title" data-i18n="acct.delete">حذف حسابي</div>
+                    <div class="row-hint" data-i18n="acct.deleteHint"></div>
+                </div>
+                <button type="button" class="btn danger" id="deleteOpen" data-i18n="acct.delete">حذف حسابي</button>
+            </div>
         </section>
 
         <!-- App (PWA) -->
@@ -392,6 +507,14 @@
 
             <div class="row">
                 <div class="row-text">
+                    <div class="row-title" data-i18n="set.analytics">التحليلات (Google Analytics)</div>
+                    <div class="row-hint" data-i18n="set.analyticsHint"></div>
+                </div>
+                <label class="switch"><input type="checkbox" id="analyticsToggle"><span class="knob"></span></label>
+            </div>
+
+            <div class="row">
+                <div class="row-text">
                     <div class="row-title" data-i18n="set.export">تصدير بياناتي</div>
                     <div class="row-hint" data-i18n="set.exportHint"></div>
                 </div>
@@ -410,6 +533,24 @@
         </section>
 
     </main>
+
+    <!-- Delete account -->
+    <div class="modal" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+        <div class="modal-panel">
+            <h3 id="deleteTitle" data-i18n="acct.confirmTitle">حذف الحساب نهائيًا؟</h3>
+            <p data-i18n="acct.confirmText"></p>
+
+            <input type="password" class="text-input" id="deletePassword" autocomplete="current-password" data-i18n-placeholder="acct.password">
+
+            <div class="modal-error" id="deleteError" role="alert"></div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn" id="deleteCancel" data-i18n="acct.cancel">إلغاء</button>
+                <button type="button" class="btn danger" id="deleteConfirm" data-i18n="acct.confirmBtn">احذف حسابي نهائيًا</button>
+            </div>
+        </div>
+    </div>
+
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -457,6 +598,7 @@
 
             const TOGGLES = {
                 autoToggle: ["pomo", "auto"],
+                alarmToggle: ["pomo", "alarm"],
                 soundToggle: ["sound"],
                 wakeToggle: ["wakeLock"],
                 shortcutsToggle: ["shortcuts"]
@@ -509,6 +651,7 @@
                 });
 
                 $("autoToggle").checked = s.pomo.auto;
+                $("alarmToggle").checked = s.pomo.alarm;
                 $("soundToggle").checked = s.sound;
                 $("wakeToggle").checked = s.wakeLock;
                 $("shortcutsToggle").checked = s.shortcuts;
@@ -522,7 +665,94 @@
                     notifSupported && s.notifications && Notification.permission === "granted";
 
                 if (focused !== $("goalInput")) $("goalInput").value = ST.load().goal;
+
+                renderSubjectList();
+
+                $("analyticsToggle").checked =
+                    !!window.TickwellConsent && window.TickwellConsent.get() === true;
             }
+
+
+            /* المواد */
+            function renderSubjectList() {
+                const box = $("subjectList");
+                const subjects = S.get().subjects;
+
+                box.innerHTML = "";
+
+                if (!subjects.length) {
+                    const empty = document.createElement("div");
+
+                    empty.className = "chip-empty";
+                    empty.textContent = S.t("set.subjectsEmpty");
+
+                    box.appendChild(empty);
+                    return;
+                }
+
+                subjects.forEach((name) => {
+                    const chip = document.createElement("span");
+                    const label = document.createElement("span");
+                    const remove = document.createElement("button");
+                    const dot = document.createElement("button");
+
+                    chip.className = "chip-item";
+                    label.textContent = name;
+
+                    dot.type = "button";
+                    dot.className = "chip-dot";
+                    dot.style.background = S.subjectColor(name);
+                    dot.setAttribute("aria-label", S.t("set.changeColor") + ": " + name);
+
+                    dot.addEventListener("click", () => {
+                        const palette = S.palette();
+                        const next = palette[(palette.indexOf(S.subjectColor(name)) + 1) % palette.length];
+
+                        S.update({ subjectColors: Object.assign({}, S.get().subjectColors, { [name]: next }) });
+                        saved();
+                    });
+
+                    remove.type = "button";
+                    remove.className = "chip-remove";
+                    remove.textContent = "×";
+                    remove.setAttribute("aria-label", S.t("set.removeSubject") + ": " + name);
+
+                    remove.addEventListener("click", () => {
+                        S.update({ subjects: S.get().subjects.filter((x) => x !== name) });
+                        saved();
+                    });
+
+                    chip.appendChild(dot);
+                    chip.appendChild(label);
+                    chip.appendChild(remove);
+                    box.appendChild(chip);
+                });
+            }
+
+            function addSubject() {
+                const input = $("subjectInput");
+                const name = input.value.trim().slice(0, 30);
+
+                if (!name) return;
+
+                const list = S.get().subjects.slice();
+
+                if (!list.includes(name) && list.length < 20) list.push(name);
+
+                S.update({ subjects: list });
+
+                input.value = "";
+                saved();
+            }
+
+            $("addSubject").addEventListener("click", addSubject);
+
+            $("subjectInput").addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    addSubject();
+                }
+            });
 
 
             /* اللغة والوضع */
@@ -601,11 +831,17 @@
             });
 
             $("volumeRange").addEventListener("change", () => {
-                S.beep(true);
+                S.chime(true);
                 saved();
             });
 
-            $("testSound").addEventListener("click", () => S.beep(true));
+            $("testSound").addEventListener("click", () => S.chime(true));
+
+            $("testAlarm").addEventListener("click", () => {
+                if (S.startAlarm(true)) {
+                    setTimeout(S.stopAlarm, 3000);
+                }
+            });
 
 
             /* الهدف اليومي */
@@ -677,6 +913,7 @@
 
                 $("syncLogin").style.display = signedOut ? "" : "none";
                 $("syncNow").style.display = signedOut || checking ? "none" : "";
+                $("deleteRow").style.display = signedOut || checking ? "none" : "";
                 $("syncNow").disabled = st.state === "syncing";
 
                 if (checking) {
@@ -713,6 +950,72 @@
                 await window.TickwellSync.syncNow();
                 renderSync();
             });
+
+            /* التحليلات */
+            $("analyticsToggle").addEventListener("change", (event) => {
+                if (window.TickwellConsent) window.TickwellConsent.set(event.target.checked);
+
+                saved();
+            });
+
+            window.addEventListener("tickwell:consent", populate);
+
+
+            /* حذف الحساب */
+            function openDelete() {
+                $("deletePassword").value = "";
+                $("deleteError").textContent = "";
+                $("deleteConfirm").disabled = false;
+                $("deleteModal").classList.add("open");
+                $("deletePassword").focus();
+            }
+
+            function closeDelete() {
+                $("deleteModal").classList.remove("open");
+            }
+
+            $("deleteOpen").addEventListener("click", openDelete);
+            $("deleteCancel").addEventListener("click", closeDelete);
+
+            $("deleteModal").addEventListener("click", (event) => {
+                if (event.target === $("deleteModal")) closeDelete();
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") closeDelete();
+            });
+
+            $("deleteConfirm").addEventListener("click", async () => {
+                const password = $("deletePassword").value;
+
+                if (!password) {
+                    $("deletePassword").focus();
+                    return;
+                }
+
+                $("deleteConfirm").disabled = true;
+                $("deleteError").textContent = "";
+
+                try {
+                    await window.TickwellAuth.deleteAccount(password);
+
+                    closeDelete();
+                    toast(S.t("acct.deleted"));
+
+                    setTimeout(() => { window.location.href = "index.html"; }, 1500);
+                } catch (error) {
+                    const code = error && error.code;
+
+                    $("deleteError").textContent =
+                        code === "auth/wrong-password" || code === "auth/invalid-credential" ? S.t("acct.wrong")
+                        : code === "auth/too-many-requests" ? S.t("err.tooMany")
+                        : code === "auth/network-request-failed" ? S.t("err.network")
+                        : S.t("acct.error");
+
+                    $("deleteConfirm").disabled = false;
+                }
+            });
+
 
             /* تثبيت التطبيق */
             function renderPwa() {

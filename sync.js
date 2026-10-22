@@ -11,7 +11,8 @@ import {
     getFirestore,
     doc,
     onSnapshot,
-    setDoc
+    setDoc,
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const Stats = window.TickwellStats;
@@ -34,6 +35,7 @@ let pushTimer = null;
 let timeoutTimer = null;
 let applying = false;
 let initialized = false;
+let deleting = false;      // أثناء حذف الحساب: ممنوع أي رفع جديد
 
 let state = "signedOut";   // signedOut | syncing | synced | error
 let lastSynced = 0;
@@ -78,7 +80,7 @@ function sigOf(data) {
 
 
 async function push() {
-    if (!uid) return false;
+    if (!uid || deleting) return false;
 
     clearTimeout(pushTimer);
     pushTimer = null;
@@ -111,7 +113,7 @@ async function push() {
 
 
 function schedulePush() {
-    if (!uid || !initialized || applying) return;
+    if (!uid || !initialized || applying || deleting) return;
 
     clearTimeout(pushTimer);
     pushTimer = setTimeout(push, PUSH_DELAY);
@@ -177,7 +179,7 @@ function listen() {
         doc(db, "users", uid),
         (snap) => {
             /* تجاهل صدى كتابتنا المحلية */
-            if (snap.metadata.hasPendingWrites) return;
+            if (snap.metadata.hasPendingWrites || deleting) return;
 
             handleCloud(snap.exists() ? snap.data() : null);
         },
@@ -213,6 +215,8 @@ function teardown() {
 onAuthStateChanged(auth, (user) => {
     teardown();
 
+    deleting = false;
+
     if (!user) {
         uid = null;
         email = null;
@@ -246,6 +250,23 @@ window.TickwellSync = {
         lastSig = "";
 
         return push();
+    },
+
+    /* حذف بيانات الحساب من السحابة (بيتنادى قبل حذف الحساب نفسه) */
+    deleteCloudData: async () => {
+        if (!uid) return;
+
+        deleting = true;
+        teardown();
+
+        try {
+            await deleteDoc(doc(db, "users", uid));
+        } catch (error) {
+            deleting = false;
+            listen();
+
+            throw error;
+        }
     },
 
     /* قبل تسجيل الخروج: نرفع آخر التغييرات ونمسح إحصائيات الجهاز */
